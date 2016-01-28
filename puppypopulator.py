@@ -12,22 +12,12 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from puppies import Base, Shelter, Puppy
+from puppies import Base, Shelter, Puppy, PuppyProfile
 # from flask.ext.sqlalchemy import SQLAlchemy
 from random import randint
 import datetime
 import random
-
-# import requests
-#
-# lipsum_sizes = ['short', 'medium', 'long', 'verylong']
-# lipsum_text = requests.get(
-#         url="http://loripsum.net/api/1/{0}/plaintext".format(lipsum_sizes[1]))
-# if lipsum_text.status_code == 200:
-#     lipsum_text = lipsum_text.content
-# else:
-#     raise Exception(
-#         "Request error with code: {}".format(lipsum_text.status_code))
+import requests
 
 engine = create_engine('sqlite:///puppyshelter.db')
 
@@ -112,16 +102,44 @@ def create_random_weight():
     return random.uniform(1.0, 40.0)
 
 
+def create_lipsum_paragraph():
+    lipsum_sizes = ['short', 'medium', 'long', 'verylong']
+    try:
+        lipsum_req = requests.get(
+                url="http://loripsum.net/api/1/{0}/plaintext".format(
+                        random.choice(lipsum_sizes)))
+    except requests.ConnectionError as req_err:
+        print(req_err.message)
+    if lipsum_req.status_code == 200:
+        lipsum_text = lipsum_req.content
+    else:
+        raise Exception(
+                "Request error with code: {}".format(lipsum_req.status_code))
+    return unicode(lipsum_text.decode('utf-8'))
+
+
 for i, x in enumerate(male_names):
     new_puppy = Puppy(name=x, gender="male", dateOfBirth=create_random_age(),
-                      picture=random.choice(puppy_images),
                       shelter_id=randint(1, 5), weight=create_random_weight())
     session.add(new_puppy)
+    session.flush()  # sync to DB but not persist
+    session.refresh(new_puppy)
+    new_puppy_profile = PuppyProfile(picture=random.choice(puppy_images),
+                                     description=create_lipsum_paragraph(),
+                                     specialNeeds=create_lipsum_paragraph(),
+                                     puppy_id=new_puppy.id)
+    session.add(new_puppy_profile)
     session.commit()
 
 for i, x in enumerate(female_names):
     new_puppy = Puppy(name=x, gender="female", dateOfBirth=create_random_age(),
-                      picture=random.choice(puppy_images),
                       shelter_id=randint(1, 5), weight=create_random_weight())
     session.add(new_puppy)
+    session.flush()  # sync to DB but not persist
+    session.refresh(new_puppy)
+    new_puppy_profile = PuppyProfile(picture=random.choice(puppy_images),
+                                     description=create_lipsum_paragraph(),
+                                     specialNeeds=create_lipsum_paragraph(),
+                                     puppy_id=new_puppy.id)
+    session.add(new_puppy_profile)
     session.commit()
