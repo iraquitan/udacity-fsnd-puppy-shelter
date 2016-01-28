@@ -37,15 +37,17 @@ class Puppy(Base):
     shelter_id = Column(Integer, ForeignKey('shelter.id'))
     shelter = relationship(Shelter)
     weight = Column(Numeric(10))
+    profile = relationship('PuppyProfile', uselist=False, backref='puppy')
 
 
-# class PuppyProfile(Base):
-#     __tablename__ = 'puppy_profile'
-#     picture = Column(String)
-#     description = Column(String)
-#     specialNeeds = Column(String)
-#     puppy_id = Column(Integer, ForeignKey(Puppy.id))
-#     puppy = relationship(Puppy, uselist=False)
+# Exercise 3
+class PuppyProfile(Base):
+    __tablename__ = 'puppy_profile'
+    # id = Column(Integer, primary_key=True)
+    puppy_id = Column(Integer, ForeignKey('puppy.id'), primary_key=True)
+    picture = Column(String)
+    description = Column(String)
+    specialNeeds = Column(String)
 
 engine = create_engine('sqlite:///puppyshelter.db')
 
