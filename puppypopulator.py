@@ -18,6 +18,8 @@ from random import randint
 import datetime
 import random
 import requests
+from time import sleep
+from requests.exceptions import ConnectionError, HTTPError
 
 engine = create_engine('sqlite:///puppyshelter.db')
 
@@ -108,7 +110,10 @@ def create_lipsum_paragraph():
         lipsum_req = requests.get(
                 url="http://loripsum.net/api/1/{0}/plaintext".format(
                         random.choice(lipsum_sizes)))
-    except requests.ConnectionError as req_err:
+    except ConnectionError:
+        print(ConnectionError.message)
+        sleep(1)
+    except HTTPError as req_err:
         print(req_err.message)
     if lipsum_req.status_code == 200:
         lipsum_text = lipsum_req.content
@@ -124,12 +129,14 @@ for i, x in enumerate(male_names):
     session.add(new_puppy)
     session.flush()  # sync to DB but not persist
     session.refresh(new_puppy)
+
     new_puppy_profile = PuppyProfile(picture=random.choice(puppy_images),
                                      description=create_lipsum_paragraph(),
                                      specialNeeds=create_lipsum_paragraph(),
                                      puppy_id=new_puppy.id)
     session.add(new_puppy_profile)
     session.commit()
+    # sleep(1)
 
 for i, x in enumerate(female_names):
     new_puppy = Puppy(name=x, gender="female", dateOfBirth=create_random_age(),
@@ -143,3 +150,4 @@ for i, x in enumerate(female_names):
                                      puppy_id=new_puppy.id)
     session.add(new_puppy_profile)
     session.commit()
+    # sleep(1)
