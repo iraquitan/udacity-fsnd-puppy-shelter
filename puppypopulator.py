@@ -17,9 +17,12 @@ from puppies import Base, Shelter, Puppy, PuppyProfile
 from random import randint
 import datetime
 import random
+import re
 import requests
 from time import sleep
-from requests.exceptions import ConnectionError, HTTPError
+from requests.exceptions import ConnectionError, HTTPError, ProxyError
+
+# http://api.randomuser.me/?results=10000 # random name generator
 
 engine = create_engine('sqlite:///puppyshelter.db')
 
@@ -77,23 +80,32 @@ female_names = ['Bella', 'Lucy', 'Molly', 'Daisy', 'Maggie', 'Sophie', 'Sadie',
                 'Luna', 'Dixie', 'Honey', 'Dakota']
 
 puppy_images = [
-    "http://pixabay.com/get/da0c8c7e4aa09ba3a353/1433170694/dog-785193_1280.jpg?direct",  # noqa
-    "http://pixabay.com/get/6540c0052781e8d21783/1433170742/dog-280332_1280.jpg?direct",  # noqa
-    "http://pixabay.com/get/8f62ce526ed56cd16e57/1433170768/pug-690566_1280.jpg?direct",  # noqa
-    "http://pixabay.com/get/be6ebb661e44f929e04e/1433170798/pet-423398_1280.jpg?direct",  # noqa
-    "http://pixabay.com/static/uploads/photo/2010/12/13/10/20/beagle-puppy-2681_640.jpg",  # noqa
-    "http://pixabay.com/get/4b1799cb4e3f03684b69/1433170894/dog-589002_1280.jpg?direct",  # noqa
-    "http://pixabay.com/get/3157a0395f9959b7a000/1433170921/puppy-384647_1280.jpg?direct",  # noqa
-    "http://pixabay.com/get/2a11ff73f38324166ac6/1433170950/puppy-742620_1280.jpg?direct",  # noqa
-    "http://pixabay.com/get/7dcd78e779f8110ca876/1433170979/dog-710013_1280.jpg?direct",  # noqa
+    "http://pixabay.com/get/da0c8c7e4aa09ba3a353/1433170694/dog-785193_1280.jpg?direct",
+    # noqa
+    "http://pixabay.com/get/6540c0052781e8d21783/1433170742/dog-280332_1280.jpg?direct",
+    # noqa
+    "http://pixabay.com/get/8f62ce526ed56cd16e57/1433170768/pug-690566_1280.jpg?direct",
+    # noqa
+    "http://pixabay.com/get/be6ebb661e44f929e04e/1433170798/pet-423398_1280.jpg?direct",
+    # noqa
+    "http://pixabay.com/static/uploads/photo/2010/12/13/10/20/beagle-puppy-2681_640.jpg",
+    # noqa
+    "http://pixabay.com/get/4b1799cb4e3f03684b69/1433170894/dog-589002_1280.jpg?direct",
+    # noqa
+    "http://pixabay.com/get/3157a0395f9959b7a000/1433170921/puppy-384647_1280.jpg?direct",
+    # noqa
+    "http://pixabay.com/get/2a11ff73f38324166ac6/1433170950/puppy-742620_1280.jpg?direct",
+    # noqa
+    "http://pixabay.com/get/7dcd78e779f8110ca876/1433170979/dog-710013_1280.jpg?direct",
+    # noqa
     "http://pixabay.com/get/31d494632fa1c64a7225/1433171005/dog-668940_1280.jpg?direct"]  # noqa
 
 
 # This method will make a random age for each puppy between 0-18
 # months(approx.) old from the day the algorithm was run.
-def create_random_age():
+def create_random_age(max_days=540):
     today = datetime.date.today()
-    days_old = randint(0, 540)
+    days_old = randint(0, max_days)
     birthday = today - datetime.timedelta(days=days_old)
     return birthday
 
@@ -104,24 +116,70 @@ def create_random_weight():
     return random.uniform(1.0, 40.0)
 
 
-def create_lipsum_paragraph():
-    lipsum_sizes = ['short', 'medium', 'long', 'verylong']
-    try:
-        lipsum_req = requests.get(
-                url="http://loripsum.net/api/1/{0}/plaintext".format(
-                        random.choice(lipsum_sizes)))
-    except ConnectionError:
-        print(ConnectionError.message)
-        sleep(1)
-    except HTTPError as req_err:
-        print(req_err.message)
-    if lipsum_req.status_code == 200:
-        lipsum_text = lipsum_req.content
-    else:
-        raise Exception(
-                "Request error with code: {}".format(lipsum_req.status_code))
-    return unicode(lipsum_text.decode('utf-8'))
+# This class can get a random lorem ipsum paragraph from http://loripsum.net
+# and can use the vocabulary to generate random paragraphs
+class Loripsum(object):
+    """"""
+    lipsum_sizes = {'short': range(25, 36), 'medium': range(35, 76),
+                    'long': range(100, 150), 'verylong': range(150, 300)}
 
+    def __init__(self, lorem_start=True, pre_load=False):
+        if lorem_start:
+            self.start = u"Lorem ipsum dolor sit amet, "
+        else:
+            self.start = ""
+        self.words_list = None
+        if pre_load:
+            self.rest_random_paragraph('verylong', 5)
+
+    def rest_random_paragraph(self, size=None, par_num=1):
+        if size is not None:
+            if size not in self.lipsum_sizes.keys():
+                raise ValueError("Got {} as size. Supported values are: "
+                                 "'short', 'medium', 'long' and "
+                                 "'verylong'.".format(size))
+
+        try:
+            if size is None:
+                lipsum_req = requests.get(
+                        url="http://loripsum.net/api/{0}/{1}/plaintext".format(
+                                par_num, random.choice(
+                                        self.lipsum_sizes.keys())))
+            else:
+                lipsum_req = requests.get(
+                        url="http://loripsum.net/api/{0}/{1}/plaintext".format(
+                                par_num, size))
+            if lipsum_req.status_code == 200:
+                lipsum_text = lipsum_req.content
+            else:
+                raise Exception("Request error with code: {}".format(
+                        lipsum_req.status_code))
+            paragraph = unicode(lipsum_text.decode('utf-8'))
+            if self.words_list is None:
+                self.words_list = list(set(re.findall('\w+', paragraph)))
+            else:
+                current_words = set(self.words_list)
+                self.words_list = list(current_words.union(
+                        set(re.findall('\w+', paragraph))))
+            return paragraph
+        except Exception as err:
+            print(err.args)
+
+    def local_random_paragraph(self, size=None):
+        if size is None:
+            size = random.choice(self.lipsum_sizes.keys())
+        if self.words_list is None:
+            raise ValueError("No words on list. You first need to run "
+                             "rest_random_paragraph().")
+        shuffled_words = list(self.words_list)
+        random.shuffle(shuffled_words)
+        n_words = random.choice(self.lipsum_sizes[size])
+        local_random_paragraph = self.start + u" ".join(
+                shuffled_words[:n_words]) + random.choice([".", "!", "?"])
+        return local_random_paragraph
+
+
+lp = Loripsum(pre_load=True)  # Instance of Loripsum with pre-loaded vocabulary
 
 for i, x in enumerate(male_names):
     new_puppy = Puppy(name=x, gender="male", dateOfBirth=create_random_age(),
@@ -131,12 +189,11 @@ for i, x in enumerate(male_names):
     session.refresh(new_puppy)
 
     new_puppy_profile = PuppyProfile(picture=random.choice(puppy_images),
-                                     description=create_lipsum_paragraph(),
-                                     specialNeeds=create_lipsum_paragraph(),
+                                     description=lp.local_random_paragraph(),
+                                     specialNeeds=lp.local_random_paragraph(),
                                      puppy_id=new_puppy.id)
     session.add(new_puppy_profile)
     session.commit()
-    # sleep(1)
 
 for i, x in enumerate(female_names):
     new_puppy = Puppy(name=x, gender="female", dateOfBirth=create_random_age(),
@@ -145,9 +202,10 @@ for i, x in enumerate(female_names):
     session.flush()  # sync to DB but not persist
     session.refresh(new_puppy)
     new_puppy_profile = PuppyProfile(picture=random.choice(puppy_images),
-                                     description=create_lipsum_paragraph(),
-                                     specialNeeds=create_lipsum_paragraph(),
+                                     description=lp.local_random_paragraph(),
+                                     specialNeeds=lp.local_random_paragraph(),
                                      puppy_id=new_puppy.id)
     session.add(new_puppy_profile)
     session.commit()
-    # sleep(1)
+
+# TODO Populate adopter table and relationships
