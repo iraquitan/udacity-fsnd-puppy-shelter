@@ -168,11 +168,35 @@ class Loripsum(object):
         return local_random_paragraph
 
 
+# Exercise 5
+def check_puppy_into_shelter(puppy_id, shelter_id):
+    check_shelter_q = session.query(Shelter).filter(
+        Shelter.id == shelter_id,
+        Shelter.maximum_capacity > Shelter.current_occupancy)
+    check_shelter = session.query(check_shelter_q.exists())[0][0]
+    if check_shelter:
+        # Update puppy shelter_id
+        puppy_to_check = session.query(Puppy).filter_by(id=puppy_id).one()
+        puppy_to_check.shelter_id = shelter_id
+        session.add(puppy_to_check)
+        # Update shelter current occupancy
+        shelter_to_check = session.query(Shelter).filter_by(
+            id=shelter_id).one()
+        shelter_to_check.current_occupancy += 1
+        session.add(shelter_to_check)
+        session.commit()
+    else:
+        raise Exception("Shelter {} is already at full capacity. "
+                        "Chose another shelter".format(shelter_id))
+
+
 lp = Loripsum(pre_load=True)  # Instance of Loripsum with pre-loaded vocabulary
 
 for i, x in enumerate(male_names):
+    # new_puppy = Puppy(name=x, gender="male", dateOfBirth=create_random_age(),
+    #                  shelter_id=randint(1, 5), weight=create_random_weight())
     new_puppy = Puppy(name=x, gender="male", dateOfBirth=create_random_age(),
-                      shelter_id=randint(1, 5), weight=create_random_weight())
+                      weight=create_random_weight())
     session.add(new_puppy)
     session.flush()  # sync to DB but not persist
     session.refresh(new_puppy)
@@ -183,10 +207,13 @@ for i, x in enumerate(male_names):
                                      puppy_id=new_puppy.id)
     session.add(new_puppy_profile)
     session.commit()
+    check_puppy_into_shelter(new_puppy.id, randint(1, 5))
 
 for i, x in enumerate(female_names):
+    # new_puppy=Puppy(name=x, gender="female", dateOfBirth=create_random_age(),
+    #                  shelter_id=randint(1, 5), weight=create_random_weight())
     new_puppy = Puppy(name=x, gender="female", dateOfBirth=create_random_age(),
-                      shelter_id=randint(1, 5), weight=create_random_weight())
+                      weight=create_random_weight())
     session.add(new_puppy)
     session.flush()  # sync to DB but not persist
     session.refresh(new_puppy)
@@ -196,5 +223,6 @@ for i, x in enumerate(female_names):
                                      puppy_id=new_puppy.id)
     session.add(new_puppy_profile)
     session.commit()
+    check_puppy_into_shelter(new_puppy.id, randint(1, 5))
 
 # TODO Populate adopter table and relationships
