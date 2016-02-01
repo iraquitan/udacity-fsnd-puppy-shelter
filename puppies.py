@@ -33,8 +33,9 @@ class Shelter(Base):
     state = Column(String(20))
     zipCode = Column(String(10))
     website = Column(String)
-    maximum_capacity = Column(Integer)
-    current_occupancy = Column(Integer)
+    maximum_capacity = Column(Integer, default=25)
+    current_occupancy = Column(Integer, default=0)
+    puppies = relationship("Puppy", back_populates='shelter')
 
 
 class Puppy(Base):
@@ -44,7 +45,7 @@ class Puppy(Base):
     gender = Column(String(6), nullable=False)
     dateOfBirth = Column(Date)
     shelter_id = Column(Integer, ForeignKey('shelter.id'))
-    shelter = relationship(Shelter)
+    shelter = relationship("Shelter", back_populates='puppies')
     weight = Column(Numeric(10))
     # profile_id = Column(Integer, ForeignKey('puppy_profile.id'))
     profile = relationship("PuppyProfile", uselist=False,
