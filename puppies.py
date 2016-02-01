@@ -33,6 +33,8 @@ class Shelter(Base):
     state = Column(String(20))
     zipCode = Column(String(10))
     website = Column(String)
+    maximum_capacity = Column(Integer)
+    current_occupancy = Column(Integer)
 
 
 class Puppy(Base):
