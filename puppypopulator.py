@@ -19,8 +19,6 @@ import datetime
 import random
 import re
 import requests
-from time import sleep
-from requests.exceptions import ConnectionError, HTTPError, ProxyError
 
 # http://api.randomuser.me/?results=10000 # random name generator
 
@@ -80,24 +78,15 @@ female_names = ['Bella', 'Lucy', 'Molly', 'Daisy', 'Maggie', 'Sophie', 'Sadie',
                 'Luna', 'Dixie', 'Honey', 'Dakota']
 
 puppy_images = [
-    "http://pixabay.com/get/da0c8c7e4aa09ba3a353/1433170694/dog-785193_1280.jpg?direct",
-    # noqa
-    "http://pixabay.com/get/6540c0052781e8d21783/1433170742/dog-280332_1280.jpg?direct",
-    # noqa
-    "http://pixabay.com/get/8f62ce526ed56cd16e57/1433170768/pug-690566_1280.jpg?direct",
-    # noqa
-    "http://pixabay.com/get/be6ebb661e44f929e04e/1433170798/pet-423398_1280.jpg?direct",
-    # noqa
-    "http://pixabay.com/static/uploads/photo/2010/12/13/10/20/beagle-puppy-2681_640.jpg",
-    # noqa
-    "http://pixabay.com/get/4b1799cb4e3f03684b69/1433170894/dog-589002_1280.jpg?direct",
-    # noqa
-    "http://pixabay.com/get/3157a0395f9959b7a000/1433170921/puppy-384647_1280.jpg?direct",
-    # noqa
-    "http://pixabay.com/get/2a11ff73f38324166ac6/1433170950/puppy-742620_1280.jpg?direct",
-    # noqa
-    "http://pixabay.com/get/7dcd78e779f8110ca876/1433170979/dog-710013_1280.jpg?direct",
-    # noqa
+    "http://pixabay.com/get/da0c8c7e4aa09ba3a353/1433170694/dog-785193_1280.jpg?direct",  # noqa
+    "http://pixabay.com/get/6540c0052781e8d21783/1433170742/dog-280332_1280.jpg?direct",  # noqa
+    "http://pixabay.com/get/8f62ce526ed56cd16e57/1433170768/pug-690566_1280.jpg?direct",  # noqa
+    "http://pixabay.com/get/be6ebb661e44f929e04e/1433170798/pet-423398_1280.jpg?direct",  # noqa
+    "http://pixabay.com/static/uploads/photo/2010/12/13/10/20/beagle-puppy-2681_640.jpg",  # noqa
+    "http://pixabay.com/get/4b1799cb4e3f03684b69/1433170894/dog-589002_1280.jpg?direct",  # noqa
+    "http://pixabay.com/get/3157a0395f9959b7a000/1433170921/puppy-384647_1280.jpg?direct",  # noqa
+    "http://pixabay.com/get/2a11ff73f38324166ac6/1433170950/puppy-742620_1280.jpg?direct",  # noqa
+    "http://pixabay.com/get/7dcd78e779f8110ca876/1433170979/dog-710013_1280.jpg?direct",  # noqa
     "http://pixabay.com/get/31d494632fa1c64a7225/1433171005/dog-668940_1280.jpg?direct"]  # noqa
 
 
@@ -143,12 +132,12 @@ class Loripsum(object):
             if size is None:
                 lipsum_req = requests.get(
                         url="http://loripsum.net/api/{0}/{1}/plaintext".format(
-                                par_num, random.choice(
+                                str(par_num), random.choice(
                                         self.lipsum_sizes.keys())))
             else:
                 lipsum_req = requests.get(
                         url="http://loripsum.net/api/{0}/{1}/plaintext".format(
-                                par_num, size))
+                                str(par_num), size))
             if lipsum_req.status_code == 200:
                 lipsum_text = lipsum_req.content
             else:
