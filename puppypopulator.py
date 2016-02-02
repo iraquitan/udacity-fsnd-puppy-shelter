@@ -11,8 +11,7 @@
 """
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
-from puppies import Base, Shelter, Puppy, PuppyProfile
+from puppies import Base, Shelter, Puppy, PuppyProfile, Adopter, adoption_table
 # from flask.ext.sqlalchemy import SQLAlchemy
 from random import randint
 import datetime
@@ -20,7 +19,7 @@ import random
 import re
 import requests
 
-# http://api.randomuser.me/?results=10000 # random name generator
+# http://api.randomuser.me/?results=10000&nat=US&gender=male # random name generator  # noqa
 
 engine = create_engine('sqlite:///puppyshelter.db')
 
@@ -199,6 +198,24 @@ def check_puppy_into_shelter(puppy_id, shelter_id):
             for av_sh in avbl_shelters:
                 print("\t|{0:^6}|{1:^50}|".format(av_sh.id, av_sh.name))
 
+
+# Exercise 6
+# Create a method for adopting a puppy based on its id. the method should also
+# take in an array of adopter ids of the family members who will be responsible
+#  for the puppy. An adopted puppy should stay in the puppy database but no
+# longer be taking up an occupancy spot in the shelter.
+def adopt_puppy(puppy_id, adopters_id_list):
+    if isinstance(adopters_id_list, list) and len(adopters_id_list) > 0:
+        for adopter_id in adopters_id_list:
+            adoption = adoption_table(adopter_id=adopter_id, puppy_id=puppy_id)
+            session.add(adoption)
+        puppy = session.query(Puppy).filter_by(id=puppy_id).one()
+        puppy.shelter_id = None  # update puppy shelter_id
+        puppy.shelter = None  # update puppy shelter relationship
+        shelter = session.query(Puppy).filter_by(id=puppy_id).one().shelter
+        shelter.current_occupancy -= 1  # update current occupancy
+        session.add(shelter)
+        session.commit()
 
 lp = Loripsum(pre_load=True)  # Instance of Loripsum with pre-loaded vocabulary
 
