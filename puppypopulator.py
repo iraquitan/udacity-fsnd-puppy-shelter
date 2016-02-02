@@ -173,7 +173,7 @@ def check_puppy_into_shelter(puppy_id, shelter_id):
     check_shelter_q = session.query(Shelter).filter(
         Shelter.id == shelter_id,
         Shelter.maximum_capacity > Shelter.current_occupancy)
-    check_shelter = session.query(check_shelter_q.exists())[0][0]
+    check_shelter = session.query(check_shelter_q.exists()).scalar()
     if check_shelter:
         # Update puppy shelter_id
         puppy_to_check = session.query(Puppy).filter_by(id=puppy_id).one()
@@ -186,15 +186,23 @@ def check_puppy_into_shelter(puppy_id, shelter_id):
         session.add(shelter_to_check)
         session.commit()
     else:
-        raise Exception("Shelter {} is already at full capacity. "
-                        "Chose another shelter".format(shelter_id))
+        city = session.query(Shelter.city).filter_by(id=shelter_id).scalar()
+        avbl_shelters = session.query(Shelter).filter(
+            Shelter.city == city, Shelter.id != shelter_id,
+            Shelter.maximum_capacity > Shelter.current_occupancy).all()
+        if len(avbl_shelters) == 0:
+            raise Exception("All shelters in {} are at full capacity. "
+                            "Create another shelter".format(city))
+        else:
+            print("You can try the following shelter(s):")
+            print("\t|{0:_^6}|{1:_^50}|".format("Id", "Name"))
+            for av_sh in avbl_shelters:
+                print("\t|{0:^6}|{1:^50}|".format(av_sh.id, av_sh.name))
 
 
 lp = Loripsum(pre_load=True)  # Instance of Loripsum with pre-loaded vocabulary
 
 for i, x in enumerate(male_names):
-    # new_puppy = Puppy(name=x, gender="male", dateOfBirth=create_random_age(),
-    #                  shelter_id=randint(1, 5), weight=create_random_weight())
     new_puppy = Puppy(name=x, gender="male", dateOfBirth=create_random_age(),
                       weight=create_random_weight())
     session.add(new_puppy)
@@ -210,8 +218,6 @@ for i, x in enumerate(male_names):
     check_puppy_into_shelter(new_puppy.id, randint(1, 5))
 
 for i, x in enumerate(female_names):
-    # new_puppy=Puppy(name=x, gender="female", dateOfBirth=create_random_age(),
-    #                  shelter_id=randint(1, 5), weight=create_random_weight())
     new_puppy = Puppy(name=x, gender="female", dateOfBirth=create_random_age(),
                       weight=create_random_weight())
     session.add(new_puppy)
