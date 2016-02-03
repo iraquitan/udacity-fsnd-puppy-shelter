@@ -76,32 +76,23 @@ female_names = ['Bella', 'Lucy', 'Molly', 'Daisy', 'Maggie', 'Sophie', 'Sadie',
                 'Luna', 'Dixie', 'Honey', 'Dakota']
 
 puppy_images = [
-    "http://pixabay.com/get/da0c8c7e4aa09ba3a353/1433170694/dog-785193_1280.jpg?direct",
-    # noqa
-    "http://pixabay.com/get/6540c0052781e8d21783/1433170742/dog-280332_1280.jpg?direct",
-    # noqa
-    "http://pixabay.com/get/8f62ce526ed56cd16e57/1433170768/pug-690566_1280.jpg?direct",
-    # noqa
-    "http://pixabay.com/get/be6ebb661e44f929e04e/1433170798/pet-423398_1280.jpg?direct",
-    # noqa
-    "http://pixabay.com/static/uploads/photo/2010/12/13/10/20/beagle-puppy-2681_640.jpg",
-    # noqa
-    "http://pixabay.com/get/4b1799cb4e3f03684b69/1433170894/dog-589002_1280.jpg?direct",
-    # noqa
-    "http://pixabay.com/get/3157a0395f9959b7a000/1433170921/puppy-384647_1280.jpg?direct",
-    # noqa
-    "http://pixabay.com/get/2a11ff73f38324166ac6/1433170950/puppy-742620_1280.jpg?direct",
-    # noqa
-    "http://pixabay.com/get/7dcd78e779f8110ca876/1433170979/dog-710013_1280.jpg?direct",
-    # noqa
+    "http://pixabay.com/get/da0c8c7e4aa09ba3a353/1433170694/dog-785193_1280.jpg?direct",  # noqa
+    "http://pixabay.com/get/6540c0052781e8d21783/1433170742/dog-280332_1280.jpg?direct",  # noqa
+    "http://pixabay.com/get/8f62ce526ed56cd16e57/1433170768/pug-690566_1280.jpg?direct",  # noqa
+    "http://pixabay.com/get/be6ebb661e44f929e04e/1433170798/pet-423398_1280.jpg?direct",  # noqa
+    "http://pixabay.com/static/uploads/photo/2010/12/13/10/20/beagle-puppy-2681_640.jpg",  # noqa
+    "http://pixabay.com/get/4b1799cb4e3f03684b69/1433170894/dog-589002_1280.jpg?direct",  # noqa
+    "http://pixabay.com/get/3157a0395f9959b7a000/1433170921/puppy-384647_1280.jpg?direct",  # noqa
+    "http://pixabay.com/get/2a11ff73f38324166ac6/1433170950/puppy-742620_1280.jpg?direct",  # noqa
+    "http://pixabay.com/get/7dcd78e779f8110ca876/1433170979/dog-710013_1280.jpg?direct",  # noqa
     "http://pixabay.com/get/31d494632fa1c64a7225/1433171005/dog-668940_1280.jpg?direct"]  # noqa
 
 
 # This method will make a random age for each puppy between 0-18
 # months(approx.) old from the day the algorithm was run.
-def create_random_age(max_days=540):
+def create_random_age(min_days=0, max_days=540):
     today = datetime.date.today()
-    days_old = randint(0, max_days)
+    days_old = randint(min_days, max_days)
     birthday = today - datetime.timedelta(days=days_old)
     return birthday
 
@@ -214,51 +205,33 @@ def check_puppy_into_shelter(puppy_id, shelter_id):
         Shelter.maximum_capacity > Shelter.current_occupancy)
     check_shelter = session.query(check_shelter_q.exists()).scalar()
     if check_shelter:
-        # Update puppy shelter_id
         puppy_to_check = session.query(Puppy).filter_by(id=puppy_id).one()
-        puppy_to_check.shelter_id = shelter_id
-        session.add(puppy_to_check)
-        # Update shelter current occupancy
         shelter_to_check = session.query(Shelter).filter_by(
             id=shelter_id).one()
+        shelter_to_check.puppies.append(puppy_to_check)
         shelter_to_check.current_occupancy += 1
         session.add(shelter_to_check)
         session.commit()
+        return True
     else:
         city = session.query(Shelter.city).filter_by(id=shelter_id).scalar()
         avbl_shelters = session.query(Shelter).filter(
             Shelter.city == city, Shelter.id != shelter_id,
             Shelter.maximum_capacity > Shelter.current_occupancy).all()
         if len(avbl_shelters) == 0:
-            raise Exception("All shelters in {} are at full capacity. "
-                            "Create another shelter".format(city))
+            print("All shelters in {} are at full capacity. "
+                  "Create another shelter".format(city))
+            return False
+            # raise Exception("All shelters in {} are at full capacity. "
+            #                 "Create another shelter".format(city))
         else:
             print("You can try the following shelter(s):")
             print("\t|{0:_^6}|{1:_^50}|".format("Id", "Name"))
             for av_sh in avbl_shelters:
                 print("\t|{0:^6}|{1:^50}|".format(av_sh.id, av_sh.name))
-
-
-# Exercise 6
-# Create a method for adopting a puppy based on its id. the method should also
-# take in an array of adopter ids of the family members who will be
-# responsible for the puppy. An adopted puppy should stay in the puppy
-# database but no longer be taking up an occupancy spot in the shelter.
-def adopt_puppy(puppy_id, adopters_id_list):
-    if isinstance(adopters_id_list, list) and len(adopters_id_list) > 0:
-        for adopter_id in adopters_id_list:
-            adoption = adoption_table(adopter_id=adopter_id, puppy_id=puppy_id)
-            session.add(adoption)
-        puppy = session.query(Puppy).filter_by(id=puppy_id).one()
-        puppy.shelter_id = None  # update puppy shelter_id
-        puppy.shelter = None  # update puppy shelter relationship
-        shelter = session.query(Puppy).filter_by(id=puppy_id).one().shelter
-        shelter.current_occupancy -= 1  # update current occupancy
-        session.add(shelter)
-        session.commit()
+            return False
 
 lp = Loripsum(pre_load=True)  # Instance of Loripsum with pre-loaded vocabulary
-up = Useripsum(pre_load=True)  # Instance of Useripsum with pre-loaded data
 for i, x in enumerate(male_names):
     new_puppy = Puppy(name=x, gender="male", dateOfBirth=create_random_age(),
                       weight=create_random_weight())
@@ -269,12 +242,12 @@ for i, x in enumerate(male_names):
     new_puppy_profile = PuppyProfile(picture=random.choice(puppy_images),
                                      description=lp.local_random_paragraph(),
                                      specialNeeds=lp.local_random_paragraph(),
-                                     puppy_id=new_puppy.id)
+                                     puppy=new_puppy)
     session.add(new_puppy_profile)
     session.commit()
     check_puppy_into_shelter(new_puppy.id, randint(1, 5))
 
-for i, x in enumerate(female_names):
+for _, x in enumerate(female_names):
     new_puppy = Puppy(name=x, gender="female", dateOfBirth=create_random_age(),
                       weight=create_random_weight())
     session.add(new_puppy)
@@ -283,9 +256,25 @@ for i, x in enumerate(female_names):
     new_puppy_profile = PuppyProfile(picture=random.choice(puppy_images),
                                      description=lp.local_random_paragraph(),
                                      specialNeeds=lp.local_random_paragraph(),
-                                     puppy_id=new_puppy.id)
+                                     puppy=new_puppy)
     session.add(new_puppy_profile)
     session.commit()
     check_puppy_into_shelter(new_puppy.id, randint(1, 5))
 
-# TODO Populate adopter table and relationships
+# Populates the adopters table
+up = Useripsum(pre_load=True)  # Instance of Useripsum with pre-loaded data
+for gender in ['female', 'male']:
+    for i in range(50):
+        user = up.get_user(gender)
+        u_name = (user['name']['first'] + " " + user['name']['last']).title()
+        u_address = (user['location']['street']).title()
+        u_city = (user['location']['city']).title()
+        u_state = (user['location']['state']).title()
+        u_zip = user['location']['zip']
+        u_email = user['email']
+        new_adopter = Adopter(name=u_name, address=u_address, city=u_city,
+                              state=u_state, zipCode=u_zip, email=u_email,
+                              dateOfBirth=create_random_age(6480, 9000),
+                              gender=gender)
+        session.add(new_adopter)
+        session.commit()
