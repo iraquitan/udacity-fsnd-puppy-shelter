@@ -71,7 +71,12 @@ class Adopter(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
     gender = Column(String(6), nullable=False)
+    address = Column(String(250))
+    city = Column(String(80))
+    state = Column(String(20))
+    zipCode = Column(String(10))
     dateOfBirth = Column(Date)
+    email = Column(String(80))
     puppies = relationship("Puppy", secondary=adoption_table,
                            back_populates="adopters")
 
