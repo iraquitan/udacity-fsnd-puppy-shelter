@@ -38,28 +38,36 @@
         </div><!--/.nav-collapse -->
       </div>
 </nav>
-    <div class="starter-template">
-        <h1>Shelters</h1>
-        <div class="container">
-            <div class="row">
-                {% for shelter in shelters %}
-                    <div class="col-sm-6 col-md-4">
-                        <div class="panel-group">
-                          <div class="panel panel-default">
-                              <div class="panel-heading">{{ shelter.name }}</div>
-                              <div class="panel-body">Address: {{ shelter.address }}</div>
-                              <div class="panel-body">City: {{ shelter.city }}</div>
-                              <div class="panel-body">State: {{ shelter.state }}</div>
-                              <div class="panel-body">Maximum capacity: {{ shelter.maximum_capacity }}</div>
-                              <div class="panel-body">Current occupancy: {{ shelter.current_occupancy }}</div>
-                          </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
+<div class="container">
+    <br>
+    <div class="row text-right">
+        <div class="col-md-4"><span></span></div>
+        <div class="col-md-4"><span></span></div>
+        <div class="col-md-4">
+            <a href="{{url_for('new_shelter')}}" class="btn btn-primary" role="button">Create new shelter</a>
         </div>
+    </div>
+    <h1>Shelters</h1>
+    <div class="container">
+        <div class="row">
+            {% for shelter in shelters %}
+                <div class="col-sm-6 col-md-4">
+                    <div class="panel-group">
+                      <div class="panel panel-default">
+                          <div class="panel-heading">{{ shelter.name }}</div>
+                          <div class="panel-body">Address: {{ shelter.address }}</div>
+                          <div class="panel-body">City: {{ shelter.city }}</div>
+                          <div class="panel-body">State: {{ shelter.state }}</div>
+                          <div class="panel-body">Maximum capacity: {{ shelter.maximum_capacity }}</div>
+                          <div class="panel-body">Current occupancy: {{ shelter.current_occupancy }}</div>
+                      </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 
-    </div><!-- /.container -->
+</div><!-- /.container -->
 
 <!-- Bootstrap core JavaScript
     ================================================== -->
