@@ -27,7 +27,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Project name</a>
+          <a class="navbar-brand" href="#">Puppy shelter</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
@@ -41,18 +41,22 @@
     <div class="starter-template">
         <h1>Shelters</h1>
         <div class="container">
-            {% for shelter in shelters %}
-                <div class="panel-group">
-                  <div class="panel panel-default">
-                      <div class="panel-heading">{{ shelter.name }}</div>
-                      <div class="panel-body">Address: {{ shelter.address }}</div>
-                      <div class="panel-body">City: {{ shelter.city }}</div>
-                      <div class="panel-body">State: {{ shelter.state }}</div>
-                      <div class="panel-body">Maximum capacity: {{ shelter.maximum_capacity }}</div>
-                      <div class="panel-body">Current occupancy: {{ shelter.current_occupancy }}</div>
-                  </div>
-                </div>
-            {% endfor %}
+            <div class="row">
+                {% for shelter in shelters %}
+                    <div class="col-sm-6 col-md-4">
+                        <div class="panel-group">
+                          <div class="panel panel-default">
+                              <div class="panel-heading">{{ shelter.name }}</div>
+                              <div class="panel-body">Address: {{ shelter.address }}</div>
+                              <div class="panel-body">City: {{ shelter.city }}</div>
+                              <div class="panel-body">State: {{ shelter.state }}</div>
+                              <div class="panel-body">Maximum capacity: {{ shelter.maximum_capacity }}</div>
+                              <div class="panel-body">Current occupancy: {{ shelter.current_occupancy }}</div>
+                          </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
 
     </div><!-- /.container -->
