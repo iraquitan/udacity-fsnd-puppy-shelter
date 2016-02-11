@@ -76,16 +76,25 @@ female_names = ['Bella', 'Lucy', 'Molly', 'Daisy', 'Maggie', 'Sophie', 'Sadie',
                 'Luna', 'Dixie', 'Honey', 'Dakota']
 
 puppy_images = [
-    "http://pixabay.com/get/da0c8c7e4aa09ba3a353/1433170694/dog-785193_1280.jpg?direct",  # noqa
-    "http://pixabay.com/get/6540c0052781e8d21783/1433170742/dog-280332_1280.jpg?direct",  # noqa
-    "http://pixabay.com/get/8f62ce526ed56cd16e57/1433170768/pug-690566_1280.jpg?direct",  # noqa
-    "http://pixabay.com/get/be6ebb661e44f929e04e/1433170798/pet-423398_1280.jpg?direct",  # noqa
-    "http://pixabay.com/static/uploads/photo/2010/12/13/10/20/beagle-puppy-2681_640.jpg",  # noqa
-    "http://pixabay.com/get/4b1799cb4e3f03684b69/1433170894/dog-589002_1280.jpg?direct",  # noqa
-    "http://pixabay.com/get/3157a0395f9959b7a000/1433170921/puppy-384647_1280.jpg?direct",  # noqa
-    "http://pixabay.com/get/2a11ff73f38324166ac6/1433170950/puppy-742620_1280.jpg?direct",  # noqa
-    "http://pixabay.com/get/7dcd78e779f8110ca876/1433170979/dog-710013_1280.jpg?direct",  # noqa
-    "http://pixabay.com/get/31d494632fa1c64a7225/1433171005/dog-668940_1280.jpg?direct"]  # noqa
+    "https://pixabay.com/static/uploads/photo/2015/05/24/22/33/dog-782498_960_720.jpg?direct",  # noqa
+    "https://pixabay.com/static/uploads/photo/2015/02/05/12/09/chihuahua-624924_960_720.jpg?direct",  # noqa
+    "https://pixabay.com/static/uploads/photo/2013/12/28/19/28/animal-portrait-234836_960_720.jpg?direct",  # noqa
+    "https://pixabay.com/static/uploads/photo/2016/01/05/17/51/dog-1123016_960_720.jpg?direct",  # noqa
+    "https://pixabay.com/static/uploads/photo/2015/03/26/09/54/pug-690566_960_720.jpg",  # noqa
+    "https://pixabay.com/static/uploads/photo/2015/11/03/12/58/dog-1020790_960_720.jpg?direct",  # noqa
+    "https://pixabay.com/static/uploads/photo/2013/10/15/08/20/dog-195877_960_720.jpg?direct",  # noqa
+    "https://pixabay.com/static/uploads/photo/2015/11/17/13/13/bulldog-1047518_960_720.jpg?direct",  # noqa
+    "https://pixabay.com/static/uploads/photo/2014/03/05/19/23/dog-280332_960_720.jpg?direct",  # noqa
+    "https://pixabay.com/static/uploads/photo/2014/08/21/14/51/pet-423398_960_720.jpg?direct",  # noqa
+    "https://pixabay.com/static/uploads/photo/2015/06/08/15/02/pug-801826_960_720.jpg",  # noqa
+    "https://pixabay.com/static/uploads/photo/2013/12/22/10/57/german-shepherd-232393_960_720.jpg",  # noqa
+    "https://pixabay.com/static/uploads/photo/2015/01/16/18/48/bulldog-601714_960_720.jpg",  # noqa
+    "https://pixabay.com/static/uploads/photo/2010/12/13/10/20/beagle-puppy-2681_960_720.jpg",  # noqa
+    "https://pixabay.com/static/uploads/photo/2013/07/30/09/37/dog-168815_960_720.jpg",  # noqa
+    "https://pixabay.com/static/uploads/photo/2015/12/31/07/08/szofy-1115306_960_720.jpg",  # noqa
+    "https://pixabay.com/static/uploads/photo/2014/07/05/08/50/puppy-384647_960_720.jpg",  # noqa
+    "https://pixabay.com/static/uploads/photo/2014/11/20/00/49/english-bulldog-538485_960_720.jpg",  # noqa
+    "https://pixabay.com/static/uploads/photo/2015/08/24/00/48/dog-903990_960_720.jpg"]  # noqa
 
 
 # This method will make a random age for each puppy between 0-18
