@@ -26,6 +26,14 @@ def shelters():
     return render_template('shelters.html', shelters=shelters)
 
 
+@app.route('/shelter/new', methods=['GET', 'POST'])
+def new_shelter():
+    if request.method == 'POST':
+        pass
+    else:
+        return render_template('newshelter.html')
+
+
 @app.route('/puppies', defaults={'page': 1})
 @app.route('/puppies/page/<int:page>')
 def puppies(page):
@@ -88,7 +96,7 @@ def new_puppy():
 
 @app.route('/puppy/<int:puppy_id>/edit', methods=['GET', 'POST'])
 def edit_puppy(puppy_id):
-    puppy = Puppy.query.filter(id=puppy_id)
+    puppy = Puppy.query.filter_by(id=puppy_id).one()
     if request.method == 'POST':
         pass
     else:
