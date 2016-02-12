@@ -11,7 +11,7 @@ from datetime import datetime
 from flask import Flask, request, render_template, redirect, abort, flash, \
     url_for
 from puppyshelter.control import Pagination, get_puppies_for_page, \
-    count_all_puppies
+    count_all_puppies, get_carousel_puppies
 from puppyshelter.database import db_session
 from puppyshelter.models import Adopter, Puppy, PuppyProfile, Shelter
 
@@ -20,7 +20,16 @@ app = Flask(__name__)
 PER_PAGE = 20
 
 
+@app.route('/')
+@app.route('/index')
+@app.route('/index/')
+def index():
+    puppies = get_carousel_puppies()
+    return render_template('index.html', puppies=puppies)
+
+
 @app.route('/shelters')
+@app.route('/shelters/')
 def shelters():
     shelters = Shelter.query.all()
     return render_template('shelters.html', shelters=shelters)
@@ -97,7 +106,21 @@ def edit_shelter(shelter_id):
         return render_template('editshelter.html', shelter=shelter)
 
 
+@app.route('/shelters/<int:shelter_id>/delete', methods=['GET', 'POST'])
+def delete_shelter(shelter_id):
+    shelter = Shelter.query.filter_by(id=shelter_id).one()
+    if request.method == 'POST':
+        db_session.delete(shelter)
+        db_session.commit()
+        print("Puppy {} deleted!".format(shelter_id))
+        flash("Puppy {} deleted!".format(shelter_id))
+        return redirect(url_for('shelters'))
+    else:
+        return render_template('deleteshelter.html', shelter=shelter)
+
+
 @app.route('/puppies', defaults={'page': 1})
+@app.route('/puppies/', defaults={'page': 1})
 @app.route('/puppies/page/<int:page>')
 def puppies(page):
     count = count_all_puppies()
@@ -107,6 +130,12 @@ def puppies(page):
     pagination = Pagination(page, PER_PAGE, count)
     return render_template('puppies.html', pagination=pagination,
                            puppies=puppies)
+
+
+@app.route('/puppies/<int:puppy_id>/profile')
+def puppy_profile(puppy_id):
+    puppy = Puppy.query.filter_by(id=puppy_id).one()
+    return render_template('puppyprofile.html', puppy=puppy)
 
 
 @app.route('/puppies/new', methods=['GET', 'POST'])
@@ -204,6 +233,28 @@ def edit_puppy(puppy_id):
         return redirect(url_for('puppies'))
     else:
         return render_template('editpuppy.html', puppy=puppy)
+
+
+@app.route('/puppies/<int:puppy_id>/delete', methods=['GET', 'POST'])
+def delete_puppy(puppy_id):
+    puppy = Puppy.query.filter_by(id=puppy_id).one()
+    if request.method == 'POST':
+        db_session.delete(puppy)
+        db_session.commit()
+        print("Puppy {} deleted!".format(puppy_id))
+        flash("Puppy {} deleted!".format(puppy_id))
+        return redirect(url_for('puppies'))
+    else:
+        return render_template('deletepuppy.html', puppy=puppy)
+
+
+@app.route('/users/new', methods=['GET', 'POST'])
+def new_user():
+    if request.method == 'POST':
+        pass
+    else:
+        return render_template('newuser.html')
+
 
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
