@@ -7,6 +7,7 @@
  * Date: 2/10/16
  * Time: 1:59 AM
 """
+import random
 from sqlalchemy import func
 from math import ceil
 from .database import db_session
@@ -52,4 +53,14 @@ def count_all_puppies():
 def get_puppies_for_page(page, per_page, count):
     puppies = db_session.query(Puppy).slice((page-1) * per_page,
                                             (page-1) * per_page + per_page)
+    return puppies
+
+
+def get_carousel_puppies():
+    puppies = []
+    puppy_ids = db_session.query(Puppy.id).all()
+    for i in range(3):
+        rand_id = random.choice(puppy_ids)
+        puppy_ids.remove(rand_id)  # prevent getting the same puppy
+        puppies.append(db_session.query(Puppy).filter_by(id=rand_id[0]).one())
     return puppies
