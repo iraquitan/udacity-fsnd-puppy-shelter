@@ -39,12 +39,13 @@
 
 <div class="container">
     <div class="row row-centered">
-        <h1>Edit puppy form</h1>
+        <h1>Edit {{ puppy.name }}</h1>
         <div class="col-lg-3 col-centered">
             <form action="{{ url_for('edit_puppy', puppy_id=puppy.id) }}" method="POST">
                 <fieldset>
                     <h2>Main info</h2>
                     <section>
+                        Name:
                         <div class="input-group">
                           <span class="input-group-addon" id="name">
                               <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
@@ -54,8 +55,9 @@
                                  data-toggle="tooltip" title="Needed to create new puppy" data-placement="right">
                         </div>
                     </section>
-                    <br>
+{#                    <br>#}
                     <section>
+                        Weight:
                         <div class="input-group">
                           <span class="input-group-addon" id="weight">
                               <span class="glyphicon glyphicon-scale" aria-hidden="true"></span>
@@ -63,8 +65,9 @@
                           <input type="text" class="form-control" name="weight" placeholder="{{puppy.weight}}" aria-describedby="weight">
                         </div>
                     </section>
-                    <br>
+{#                    <br>#}
                     <section>
+                        Date of birth:
                         <div class="input-group">
                           <span class="input-group-addon" id="birth">
                               <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
@@ -72,18 +75,19 @@
                           <input type="date" class="form-control" name="dateOfBirth" placeholder="{{puppy.dateOfBirth}}" aria-describedby="birth">
                         </div>
                     </section>
-                    <br>
+{#                    <br>#}
                     <section>
+                    Gender:
                         <div class="form-group">
                           <label for="sel1">
                               <select class="form-control" id="sel1" name="gender">
                                 <option value="0" disabled="">Gender</option>
-                                {% if puppy.gender == male %}
-                                  <option value="male" selected="">Male</option>
+                                {% if puppy.gender == 'male' %}
+                                  <option value="male" selected="male">Male</option>
                                   <option value="female">Female</option>
                                 {% else %}
                                   <option value="male">Male</option>
-                                  <option value="female" selected="">Female</option>
+                                  <option value="female" selected="female">Female</option>
                                 {% endif %}
                               </select>
                           </label>
@@ -93,6 +97,7 @@
                 <fieldset>
                     <h2>Profile info</h2>
                     <section>
+                        Picture:
                         <div class="input-group">
                             <span class="input-group-addon" id="picture">
                                 <span class="glyphicon glyphicon-camera" aria-hidden="true"></span>
@@ -100,7 +105,7 @@
                             <input type="text" class="form-control" name="picture" placeholder="{{puppy.profile.picture}}" aria-describedby="picture">
                         </div>
                     </section>
-                    <br>
+{#                    <br>#}
                     <section>
                         Description:
                         <div class="input-group">
@@ -111,7 +116,7 @@
                                       placeholder="{{puppy.profile.description}}"></textarea>
                         </div>
                     </section>
-                    <br>
+{#                    <br>#}
                     <section>
                         Special needs:
                         <div class="input-group">
