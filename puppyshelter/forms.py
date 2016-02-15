@@ -7,23 +7,31 @@
  * Date: 2/14/16
  * Time: 10:24 PM
 """
-from wtforms import Form, BooleanField, StringField, PasswordField, \
-    validators, FloatField, DateField, SelectField, TextAreaField, SubmitField
+from flask_wtf import Form
+from wtforms import StringField, FloatField, DateField, SelectField, \
+    TextAreaField, FormField
 from wtforms.fields.html5 import URLField
+from wtforms.validators import url, InputRequired, Regexp, NumberRange, \
+    Optional
 
 
-class NewPuppy(Form):
-    name = StringField('Puppy name', [#validators.Length(min=4, max=25),
-                                      validators.InputRequired(
-                                          message='Puppy name is required'),
-                                      validators.Regexp(
-                                          '[A-Z]{1}[a-z]*', message='Must start with CAPS')])
-    weight = FloatField('Puppy weight', [validators.NumberRange(
-        min=0, message='Weight must be positive'), validators.Optional()])
-    date_of_birth = DateField('Date of birth', [validators.Optional()])
-    gender = SelectField('Gender', choices=[('female', 'Female'),
-                                            ('male', 'Male')])
-    picture = URLField('Picture URL')
+class PuppyProfileForm(Form):
+    picture = URLField('Picture URL', validators=[url(), Optional()])
     description = TextAreaField('Puppy description')
     special_needs = TextAreaField('Puppy special needs')
-    shelter = SelectField('Shelter', coerce=int)
+
+
+class PuppyForm(Form):
+    name = StringField('Puppy name', [InputRequired(
+                                          message='Puppy name is required'),
+                                      Regexp('[A-Z]{1}[a-z]*',
+                                             message='Should start with '
+                                                     'uppercase letter')])
+    weight = FloatField('Puppy weight', [NumberRange(
+        min=0, message='Weight must be positive'), Optional()])
+    date_of_birth = DateField('Date of birth', [Optional()])
+    gender = SelectField('Gender', choices=[('female', 'Female'),
+                                            ('male', 'Male')])
+    profile = FormField(PuppyProfileForm)
+    shelter = SelectField('Shelter', choices=[(0, 'None')], coerce=int,
+                          default=0)
