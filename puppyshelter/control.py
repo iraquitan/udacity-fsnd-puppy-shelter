@@ -10,7 +10,6 @@
 import random
 from sqlalchemy import func
 from math import ceil
-# from .database import db_session
 from . import db
 from .models import Puppy
 

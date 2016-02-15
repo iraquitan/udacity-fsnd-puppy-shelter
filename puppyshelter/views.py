@@ -12,7 +12,7 @@ from datetime import datetime
 from flask import request, render_template, redirect, abort, flash, \
     url_for
 from .control import get_carousel_puppies
-from .forms import NewPuppy
+from .forms import PuppyForm
 from . import db
 from .models import Adopter, Puppy, PuppyProfile, Shelter
 
@@ -136,63 +136,25 @@ def puppy_profile(puppy_id):
 @app.route('/puppies/new', methods=['GET', 'POST'])
 def new_puppy():
     shelters = Shelter.query.all()
-    form = NewPuppy(request.form)
-    form.shelter.choices = [(sh.id, sh.name) for sh in shelters
-                            if sh.maximum_capacity > sh.current_occupancy]
+    form = PuppyForm(request.form)
+    form.shelter.choices = form.shelter.choices + [
+        (sh.id, sh.name)
+        for sh in shelters
+        if sh.maximum_capacity > sh.current_occupancy]
     if request.method == 'POST' and form.validate():
-        # if request.form['name']:
-        #     name = request.form['name']
-        # else:
-        #     raise AttributeError("name must not be null!")
-        # if request.form['weight']:
-        #     weight = request.form['weight']
-        # else:
-        #     weight = None
-        # if request.form['dateOfBirth']:
-        #     dateOfBirth = request.form['dateOfBirth']
-        #     dtm = datetime.strptime(dateOfBirth, '%Y-%m-%d')
-        #     dateOfBirth = datetime.date(dtm)
-        # else:
-        #     dateOfBirth = None
-        # if request.form['gender']:
-        #     gender = request.form['gender']
-        # else:
-        #     gender = None
-        # # Profile info
-        # if request.form['picture']:
-        #     picture = request.form['picture']
-        # else:
-        #     picture = None
-        # if request.form['description']:
-        #     description = request.form['description']
-        # else:
-        #     description = None
-        # if request.form['specialneeds']:
-        #     specialNeeds = request.form['specialneeds']
-        # else:
-        #     specialNeeds = None
-        # if request.form['shelter']:
-        #     shelter = Shelter.query.filter_by(id=request.form['shelter']).one()
-        #     shelter.current_occupancy += 1
-        #     db.session.add(shelter)
-        # else:
-        #     shelter = None
-        #
-        # new_profile = PuppyProfile(picture=picture, description=description,
-        #                            specialNeeds=specialNeeds)
-        # new_puppy = Puppy(name=name, weight=weight, dateOfBirth=dateOfBirth,
-        #                   gender=gender, profile=new_profile, shelter=shelter)
-        new_profile = PuppyProfile(picture=form.picture.data,
-                                   description=form.description.data,
-                                   specialNeeds=form.special_needs.data)
-        new_puppy = Puppy(name=form.name.data, weight=form.weight.data,
-                          dateOfBirth=form.date_of_birth.data,
-                          gender=form.gender.data, profile=new_profile,
-                          shelter=form.shelter.data)
-        if form.shelter.data:
+        new_profile = PuppyProfile(picture=form.profile.picture.data,
+                                   description=form.profile.description.data,
+                                   specialNeeds=form.profile.special_needs.data)
+        if form.shelter.data and form.shelter.data != 0:
             shelter = Shelter.query.filter_by(id=form.shelter.data).one()
             shelter.current_occupancy += 1
             db.session.add(shelter)
+        else:
+            shelter = None
+        new_puppy = Puppy(name=form.name.data, weight=form.weight.data,
+                          dateOfBirth=form.date_of_birth.data,
+                          gender=form.gender.data, profile=new_profile,
+                          shelter=shelter)
         db.session.add(new_puppy)
         db.session.commit()
         print("New puppy created!")
@@ -206,7 +168,18 @@ def new_puppy():
 def edit_puppy(puppy_id):
     puppy = Puppy.query.filter_by(id=puppy_id).one()
     shelters = Shelter.query.all()
-    if request.method == 'POST':
+    form = PuppyForm(obj=puppy)
+    form.shelter.choices = form.shelter.choices + [
+        (sh.id, sh.name)
+        for sh in shelters
+        if sh.maximum_capacity > sh.current_occupancy]
+    form.date_of_birth.data = puppy.dateOfBirth
+    form.profile['picture'].data = puppy.profile.picture
+    form.profile['description'].data = puppy.profile.description
+    form.profile['special_needs'].data = puppy.profile.specialNeeds
+    form.shelter.data = puppy.shelter_id
+    # form.shelter.default = puppy.shelter_id
+    if request.method == 'POST' and form.validate():
         if request.form['name']:
             puppy.name = request.form['name']
         if request.form['weight']:
@@ -254,8 +227,7 @@ def edit_puppy(puppy_id):
         flash("Puppy {} edited!".format(puppy_id))
         return redirect(url_for('puppies'))
     else:
-        return render_template('editpuppy.html', puppy=puppy,
-                               shelters=shelters)
+        return render_template('editpuppy.html', form=form, puppy=puppy)
 
 
 @app.route('/puppies/<int:puppy_id>/adopt', methods=['GET', 'POST'])
