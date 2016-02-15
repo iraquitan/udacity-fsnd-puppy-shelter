@@ -86,7 +86,13 @@
     </form>
 {%- endmacro %}
 
-{% macro render_field2(field) %}
+{# Renders field WTForms example.
+    Params:
+        field - WTForm field
+    Example usage:
+        {{ macros.render_fieldWTF(form.email) }}
+#}
+{% macro render_fieldWTF(field) %}
   <dt>{{ field.label }}
   <dd>{{ field(**kwargs)|safe }}
   {% if field.errors %}
@@ -98,3 +104,25 @@
   {% endif %}
   </dd>
 {% endmacro %}
+
+{# Renders field for bootstrap 3 standards.
+    Params:
+        field - WTForm field
+        kwargs - pass any arguments you want in order to put them into the html attributes.
+        There are few exceptions: for - for_, class - class_, class__ - class_
+    Example usage:
+        {{ macros.render_fieldBS(form.email, placeholder='Input email', type='email') }}
+#}
+{% macro render_fieldBS(field, label_visible=true) -%}
+    <div class="form-group {% if field.errors %}has-error{% endif %} {{ kwargs.pop('class_', '') }}">
+        {% if (field.type != 'HiddenField' and field.type !='CSRFTokenField') and label_visible %}
+            <label for="{{ field.id }}" class="control-label">{{ field.label }}</label>
+        {% endif %}
+        {{ field(class_='form-control', **kwargs)|safe }}
+        {% if field.errors %}
+            {% for e in field.errors %}
+                <p class="help-block">{{ e }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+{%- endmacro %}
