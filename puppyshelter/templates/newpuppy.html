@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
-{% from 'macros.html' import render_field2 %}
+{% from 'macros.html' import render_fieldWTF %}
+{% from 'macros.html' import render_fieldBS %}
 {% block content %}
 <div class="container">
     <div class="row">
@@ -9,20 +10,20 @@
             <form action="{{ url_for('new_puppy') }}" method="POST">
                 <fieldset>
                     <h2>Main info</h2>
-                    {{ render_field2(form.name) }}
-                    {{ render_field2(form.weight) }}
-                    {{ render_field2(form.date_of_birth) }}
-                    {{ render_field2(form.gender) }}
+                    {{ render_fieldBS(form.name, placeholder=form.name.label.text) }}
+                    {{ render_fieldBS(form.weight, placeholder=form.weight.label.text) }}
+                    {{ render_fieldBS(form.date_of_birth, placeholder=form.date_of_birth.label.text) }}
+                    {{ render_fieldBS(form.gender, placeholder=form.gender.label.text) }}
                 </fieldset>
                 <fieldset>
                     <h2>Profile (Optional)</h2>
-                    {{ render_field2(form.picture) }}
-                    {{ render_field2(form.description) }}
-                    {{ render_field2(form.special_needs) }}
+                    {{ render_fieldBS(form.profile['picture'], placeholder=form.profile['picture'].label.text) }}
+                    {{ render_fieldBS(form.profile['description'], placeholder=form.profile['description'].label.text) }}
+                    {{ render_fieldBS(form.profile['special_needs'], placeholder=form.profile['special_needs'].label.text) }}
                 </fieldset>
                 <fieldset>
                     <h2>Shelter</h2>
-                    {{ render_field2(form.shelter) }}
+                    {{ render_fieldBS(form.shelter) }}
                 </fieldset>
                 <br>
                 <fieldset>

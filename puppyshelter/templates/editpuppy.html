@@ -1,157 +1,183 @@
 {% extends 'base.html' %}
+{% from 'macros.html' import render_fieldBS %}
 {% block content %}
 <div class="container">
     <div class="row">
         <div class="col-lg-3 col-md-3 col-sm-3"></div>
         <div class="col-lg-6 col-md-6 col-sm-6">
-            <h1>Edit {{ puppy.name }}</h1>
+            <h1>Edit {{ form.name.data }}</h1>
             <form action="{{ url_for('edit_puppy', puppy_id=puppy.id) }}" method="POST">
                 <fieldset>
                     <h2>Main info</h2>
-                    <section>
-                        Name:
-                        <div class="input-group">
-                          <span class="input-group-addon" id="name">
-                              <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-                          </span>
-                          <input type="text" class="form-control" name="name"
-                                 placeholder="{{puppy.name}}" aria-describedby="name"
-                                 data-toggle="tooltip" title="Needed to create new puppy" data-placement="right">
-                        </div>
-                    </section>
-{#                    <br>#}
-                    <section>
-                        Weight:
-                        <div class="input-group">
-                          <span class="input-group-addon" id="weight">
-                              <span class="glyphicon glyphicon-scale" aria-hidden="true"></span>
-                          </span>
-                          <input type="text" class="form-control" name="weight" placeholder="{{puppy.weight}}" aria-describedby="weight">
-                        </div>
-                    </section>
-{#                    <br>#}
-                    <section>
-                        Date of birth:
-                        <div class="input-group">
-                          <span class="input-group-addon" id="birth">
-                              <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
-                          </span>
-                          <input type="date" class="form-control" name="dateOfBirth" placeholder="{{puppy.dateOfBirth}}" aria-describedby="birth">
-                        </div>
-                    </section>
-{#                    <br>#}
-                    <section>
-                    Gender:
-                        <div class="form-group">
-                          <label for="sel1">
-                              <select class="form-control" id="sel1" name="gender">
-                                <option value="0" disabled="">Gender</option>
-                                {% if puppy.gender == 'male' %}
-                                  <option value="male" selected="male">Male</option>
-                                  <option value="female">Female</option>
-                                {% else %}
-                                  <option value="male">Male</option>
-                                  <option value="female" selected="female">Female</option>
-                                {% endif %}
-                              </select>
-                          </label>
-                        </div>
-                    </section>
+                    {{ render_fieldBS(form.name, placeholder=form.name.data) }}
+                    {{ render_fieldBS(form.weight, placeholder=form.weight.data) }}
+                    {{ render_fieldBS(form.date_of_birth, placeholder=form.date_of_birth.data) }}
+                    {{ render_fieldBS(form.gender, placeholder=form.gender.data) }}
                 </fieldset>
                 <fieldset>
-                    <h2>Profile info</h2>
-                    <section>
-                        Picture:
-                        <div class="input-group">
-                            <span class="input-group-addon" id="picture">
-                                <span class="glyphicon glyphicon-camera" aria-hidden="true"></span>
-                            </span>
-                            <input type="text" class="form-control" name="picture" placeholder="{{puppy.profile.picture}}" aria-describedby="picture">
-                        </div>
-                    </section>
-{#                    <br>#}
-                    <section>
-                        Description:
-                        <div class="input-group">
-                            <span class="input-group-addon" id="description">
-                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                            </span>
-                            <textarea class="form-control" name="description" aria-describedby="description" rows="5"
-                                      placeholder="{{puppy.profile.description}}"></textarea>
-                        </div>
-                    </section>
-{#                    <br>#}
-                    <section>
-                        Special needs:
-                        <div class="input-group">
-                            <span class="input-group-addon" id="specialneeds">
-                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                            </span>
-                            <textarea class="form-control" name="specialneeds" aria-describedby="specialneeds" rows="5"
-                                      placeholder="{{puppy.profile.specialNeeds}}"></textarea>
-                        </div>
-                    </section>
+                    <h2>Profile (Optional)</h2>
+                    {{ render_fieldBS(form.profile['picture'], placeholder=form.profile['picture'].data) }}
+                    {{ render_fieldBS(form.profile['description'], placeholder=form.profile['description'].data) }}
+                    {{ render_fieldBS(form.profile['special_needs'], placeholder=form.profile['special_needs'].data) }}
                 </fieldset>
                 <fieldset>
                     <h2>Shelter</h2>
-                    <section>
-                        <div class="form-group">
-                            <label for="sel-shelter">
-                                {% if puppy.adopters|length > 0 %}
-                                    <select class="form-control" disabled="disabled" id="sel-shelter" name="shelter">
-                                {% else %}
-                                    <select class="form-control" id="sel-shelter" name="shelter">
-                                {% endif %}
-                                {% if puppy.shelter %}
-                                    <option value="none" disabled="">Shelters</option>
-                                    {% for sh in shelters %}
-                                        {% if sh.maximum_capacity > sh.current_occupancy %}
-                                            {% if puppy.shelter.id == sh.id %}
-                                                <option value="{{ sh.id }}" selected="">
-                                                    {{ sh.name }} <span class="badge">{{ sh.maximum_capacity - sh.current_occupancy }}</span>
-                                                </option>
-                                            {% else %}
-                                                <option value="{{ sh.id }}">
-                                                    {{ sh.name }} <span class="badge">{{ sh.maximum_capacity - sh.current_occupancy }}</span>
-                                                </option>
-                                            {% endif %}
-                                        {% else %}
-                                            {% if puppy.shelter.id == sh.id %}
-                                                <option value="{{ sh.id }}" disabled="" selected="">
-                                                    {{ sh.name }} <span class="badge">{{ sh.maximum_capacity - sh.current_occupancy }}</span>
-                                                </option>
-                                            {% else %}
-                                                <option value="{{ sh.id }}" disabled="">
-                                                    {{ sh.name }} <span class="badge">{{ sh.maximum_capacity - sh.current_occupancy }}</span>
-                                                </option>
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    <option value="0" selected="" disabled="">Shelters</option>
-                                    {% for sh in shelters %}
-                                        {% if sh.maximum_capacity > sh.current_occupancy %}
-                                            <option value="{{ sh.id }}">
-                                                {{ sh.name }} <span class="badge">{{ sh.maximum_capacity - sh.current_occupancy }}</span>
-                                            </option>
-                                        {% else %}
-                                            <option value="{{ sh.id }}" disabled="">
-                                                {{ sh.name }} <span class="badge">{{ sh.maximum_capacity - sh.current_occupancy }}</span>
-                                            </option>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                                </select>
-                            </label>
-                        </div>
-                    </section>
+                    {{ render_fieldBS(form.shelter) }}
                 </fieldset>
                 <br>
                 <fieldset>
                     <button type="submit" class="btn btn-primary">Edit</button>
                     <a href="{{url_for('puppy_profile', puppy_id=puppy.id)}}" class="btn btn-default" role="button">Cancel</a>
                 </fieldset>
-                <br><br>
+            </form>
+            <br><br>
+{#            <form action="{{ url_for('edit_puppy', puppy_id=puppy.id) }}" method="POST">#}
+{#                <fieldset>#}
+{#                    <h2>Main info</h2>#}
+{#                    <section>#}
+{#                        Name:#}
+{#                        <div class="input-group">#}
+{#                          <span class="input-group-addon" id="name">#}
+{#                              <span class="glyphicon glyphicon-user" aria-hidden="true"></span>#}
+{#                          </span>#}
+{#                          <input type="text" class="form-control" name="name"#}
+{#                                 placeholder="{{puppy.name}}" aria-describedby="name"#}
+{#                                 data-toggle="tooltip" title="Needed to create new puppy" data-placement="right">#}
+{#                        </div>#}
+{#                    </section>#}
+{#                    <br>#}
+{#                    <section>#}
+{#                        Weight:#}
+{#                        <div class="input-group">#}
+{#                          <span class="input-group-addon" id="weight">#}
+{#                              <span class="glyphicon glyphicon-scale" aria-hidden="true"></span>#}
+{#                          </span>#}
+{#                          <input type="text" class="form-control" name="weight" placeholder="{{puppy.weight}}" aria-describedby="weight">#}
+{#                        </div>#}
+{#                    </section>#}
+{#                    <br>#}
+{#                    <section>#}
+{#                        Date of birth:#}
+{#                        <div class="input-group">#}
+{#                          <span class="input-group-addon" id="birth">#}
+{#                              <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>#}
+{#                          </span>#}
+{#                          <input type="date" class="form-control" name="dateOfBirth" placeholder="{{puppy.dateOfBirth}}" aria-describedby="birth">#}
+{#                        </div>#}
+{#                    </section>#}
+{#                    <br>#}
+{#                    <section>#}
+{#                    Gender:#}
+{#                        <div class="form-group">#}
+{#                          <label for="sel1">#}
+{#                              <select class="form-control" id="sel1" name="gender">#}
+{#                                <option value="0" disabled="">Gender</option>#}
+{#                                {% if puppy.gender == 'male' %}#}
+{#                                  <option value="male" selected="male">Male</option>#}
+{#                                  <option value="female">Female</option>#}
+{#                                {% else %}#}
+{#                                  <option value="male">Male</option>#}
+{#                                  <option value="female" selected="female">Female</option>#}
+{#                                {% endif %}#}
+{#                              </select>#}
+{#                          </label>#}
+{#                        </div>#}
+{#                    </section>#}
+{#                </fieldset>#}
+{#                <fieldset>#}
+{#                    <h2>Profile info</h2>#}
+{#                    <section>#}
+{#                        Picture:#}
+{#                        <div class="input-group">#}
+{#                            <span class="input-group-addon" id="picture">#}
+{#                                <span class="glyphicon glyphicon-camera" aria-hidden="true"></span>#}
+{#                            </span>#}
+{#                            <input type="text" class="form-control" name="picture" placeholder="{{puppy.profile.picture}}" aria-describedby="picture">#}
+{#                        </div>#}
+{#                    </section>#}
+{#                    <br>#}
+{#                    <section>#}
+{#                        Description:#}
+{#                        <div class="input-group">#}
+{#                            <span class="input-group-addon" id="description">#}
+{#                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>#}
+{#                            </span>#}
+{#                            <textarea class="form-control" name="description" aria-describedby="description" rows="5"#}
+{#                                      placeholder="{{puppy.profile.description}}"></textarea>#}
+{#                        </div>#}
+{#                    </section>#}
+{#                    <br>#}
+{#                    <section>#}
+{#                        Special needs:#}
+{#                        <div class="input-group">#}
+{#                            <span class="input-group-addon" id="specialneeds">#}
+{#                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>#}
+{#                            </span>#}
+{#                            <textarea class="form-control" name="specialneeds" aria-describedby="specialneeds" rows="5"#}
+{#                                      placeholder="{{puppy.profile.specialNeeds}}"></textarea>#}
+{#                        </div>#}
+{#                    </section>#}
+{#                </fieldset>#}
+{#                <fieldset>#}
+{#                    <h2>Shelter</h2>#}
+{#                    <section>#}
+{#                        <div class="form-group">#}
+{#                            <label for="sel-shelter">#}
+{#                                {% if puppy.adopters|length > 0 %}#}
+{#                                    <select class="form-control" disabled="disabled" id="sel-shelter" name="shelter">#}
+{#                                {% else %}#}
+{#                                    <select class="form-control" id="sel-shelter" name="shelter">#}
+{#                                {% endif %}#}
+{#                                {% if puppy.shelter %}#}
+{#                                    <option value="none" disabled="">Shelters</option>#}
+{#                                    {% for sh in shelters %}#}
+{#                                        {% if sh.maximum_capacity > sh.current_occupancy %}#}
+{#                                            {% if puppy.shelter.id == sh.id %}#}
+{#                                                <option value="{{ sh.id }}" selected="">#}
+{#                                                    {{ sh.name }} <span class="badge">{{ sh.maximum_capacity - sh.current_occupancy }}</span>#}
+{#                                                </option>#}
+{#                                            {% else %}#}
+{#                                                <option value="{{ sh.id }}">#}
+{#                                                    {{ sh.name }} <span class="badge">{{ sh.maximum_capacity - sh.current_occupancy }}</span>#}
+{#                                                </option>#}
+{#                                            {% endif %}#}
+{#                                        {% else %}#}
+{#                                            {% if puppy.shelter.id == sh.id %}#}
+{#                                                <option value="{{ sh.id }}" disabled="" selected="">#}
+{#                                                    {{ sh.name }} <span class="badge">{{ sh.maximum_capacity - sh.current_occupancy }}</span>#}
+{#                                                </option>#}
+{#                                            {% else %}#}
+{#                                                <option value="{{ sh.id }}" disabled="">#}
+{#                                                    {{ sh.name }} <span class="badge">{{ sh.maximum_capacity - sh.current_occupancy }}</span>#}
+{#                                                </option>#}
+{#                                            {% endif %}#}
+{#                                        {% endif %}#}
+{#                                    {% endfor %}#}
+{#                                {% else %}#}
+{#                                    <option value="0" selected="" disabled="">Shelters</option>#}
+{#                                    {% for sh in shelters %}#}
+{#                                        {% if sh.maximum_capacity > sh.current_occupancy %}#}
+{#                                            <option value="{{ sh.id }}">#}
+{#                                                {{ sh.name }} <span class="badge">{{ sh.maximum_capacity - sh.current_occupancy }}</span>#}
+{#                                            </option>#}
+{#                                        {% else %}#}
+{#                                            <option value="{{ sh.id }}" disabled="">#}
+{#                                                {{ sh.name }} <span class="badge">{{ sh.maximum_capacity - sh.current_occupancy }}</span>#}
+{#                                            </option>#}
+{#                                        {% endif %}#}
+{#                                    {% endfor %}#}
+{#                                {% endif %}#}
+{#                                </select>#}
+{#                            </label>#}
+{#                        </div>#}
+{#                    </section>#}
+{#                </fieldset>#}
+{#                <br>#}
+{#                <fieldset>#}
+{#                    <button type="submit" class="btn btn-primary">Edit</button>#}
+{#                    <a href="{{url_for('puppy_profile', puppy_id=puppy.id)}}" class="btn btn-default" role="button">Cancel</a>#}
+{#                </fieldset>#}
+{#                <br><br>#}
             </form>
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3"></div>
