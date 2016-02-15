@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container">
-    <div class="row row-centered">
-        <h1>New user registration form</h1>
-        <div class="col-lg-3 col-centered">
+    <div class="row">
+        <div class="col-lg-3 col-md-3 col-sm-3"></div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+            <h1>New user registration form</h1>
             <form action="{{ url_for('new_user') }}" method="POST">
                 <fieldset>
                     <section>
@@ -18,7 +19,7 @@
                                  data-toggle="tooltip" title="Needed to create new user" data-placement="right">
                         </div>
                     </section>
-{#                    <br>#}
+    {#                    <br>#}
                     <section>
                         Gender:
                         <div class="form-group">
@@ -31,7 +32,7 @@
                           </label>
                         </div>
                     </section>
-{#                    <br>#}
+    {#                    <br>#}
                     <section>
                         Date of birth:
                         <div class="input-group">
@@ -41,7 +42,7 @@
                           <input type="date" class="form-control" name="dateOfBirth" placeholder="Date of birth" aria-describedby="birth">
                         </div>
                     </section>
-{#                    <br>#}
+    {#                    <br>#}
                     <section>
                         Email:
                         <div class="input-group">
@@ -51,7 +52,7 @@
                           <input type="email" class="form-control" name="email" placeholder="User email" aria-describedby="email">
                         </div>
                     </section>
-{#                    <br>#}
+    {#                    <br>#}
                     <section>
                         Address:
                         <div class="input-group">
@@ -61,7 +62,7 @@
                           <input type="text" class="form-control" name="address" placeholder="User address" aria-describedby="address">
                         </div>
                     </section>
-{#                    <br>#}
+    {#                    <br>#}
                     <section>
                         City:
                         <div class="input-group">
@@ -71,7 +72,7 @@
                           <input type="text" class="form-control" name="city" placeholder="User city" aria-describedby="city">
                         </div>
                     </section>
-{#                    <br>#}
+    {#                    <br>#}
                     <section>
                         State:
                         <div class="input-group">
@@ -81,7 +82,7 @@
                           <input type="text" class="form-control" name="state" placeholder="User state" aria-describedby="state">
                         </div>
                     </section>
-{#                    <br>#}
+    {#                    <br>#}
                     <section>
                         Zip code:
                         <div class="input-group">
@@ -95,11 +96,12 @@
                 <br>
                 <fieldset class="text-right">
                     <button type="submit" class="btn btn-primary">Create</button>
-                    <a href="{{url_for('puppies')}}" class="btn btn-default" role="button">Cancel</a>
+                    <a href="{{url_for('index')}}" class="btn btn-default" role="button">Cancel</a>
                 </fieldset>
                 <br><br>
             </form>
         </div>
+        <div class="col-lg-3 col-md-3 col-sm-3"></div>
     </div>
 </div>
 {% endblock %}

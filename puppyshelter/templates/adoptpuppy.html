@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container">
+    <h3>Who will adopt {{ puppy.name }}?</h3>
+    <form action="{{ url_for('adopt_puppy', puppy_id=puppy.id) }}" method="POST">
+        <fieldset>
+            <label for="sel-users">Select adopter(s):</label>
+            <select multiple="multiple" class="form-control" id="sel-users" name="sel-users">
+                {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.name }}</option>
+                {% endfor %}
+            </select>
+        </fieldset>
+        <br>
+        <fieldset class="text-right">
+            <button type="submit" class="btn btn-primary">Adopt</button>
+            <a href="{{url_for('puppy_profile', puppy_id=puppy.id)}}" class="btn btn-default" role="button">Cancel</a>
+        </fieldset>
+        <br><br>
+    </form>
+    </div>
+{% endblock %}

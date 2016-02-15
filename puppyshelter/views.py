@@ -3,21 +3,18 @@
  * Project: puppy-shelter
  * Author name: Iraquitan Cordeiro Filho
  * Author login: iraquitan
- * File: project
- * Date: 2/8/16
- * Time: 2:46 PM
+ * File: views
+ * Date: 2/14/16
+ * Time: 12:33 PM
 """
+from puppyshelter import app
 from datetime import datetime
-from flask import Flask, request, render_template, redirect, abort, flash, \
+from flask import request, render_template, redirect, abort, flash, \
     url_for
-from puppyshelter.control import Pagination, get_puppies_for_page, \
-    count_all_puppies, get_carousel_puppies
-from puppyshelter.database import db_session
-from puppyshelter.models import Adopter, Puppy, PuppyProfile, Shelter
-
-
-app = Flask(__name__)
-PER_PAGE = 20
+from .control import get_carousel_puppies
+from .forms import NewPuppy
+from . import db
+from .models import Adopter, Puppy, PuppyProfile, Shelter
 
 
 @app.route('/')
@@ -69,8 +66,8 @@ def new_shelter():
         new_shelter = Shelter(name=name, address=address, city=city,
                               state=state, zipCode=zipCode, website=website,
                               maximum_capacity=maxcap)
-        db_session.add(new_shelter)
-        db_session.commit()
+        db.session.add(new_shelter)
+        db.session.commit()
         print("Shelter created!")
         flash("Shelter created!")
         return redirect(url_for('shelters'))
@@ -97,8 +94,8 @@ def edit_shelter(shelter_id):
         if request.form['maxcap'] and request.form['maxcap'] != shelter.maximum_capacity:
             shelter.maximum_capacity = request.form['maxcap']
 
-        db_session.add(shelter)
-        db_session.commit()
+        db.session.add(shelter)
+        db.session.commit()
         print("Shelter {} edited!".format(shelter_id))
         flash("Shelter {} edited!".format(shelter_id))
         return redirect(url_for('shelters'))
@@ -110,8 +107,8 @@ def edit_shelter(shelter_id):
 def delete_shelter(shelter_id):
     shelter = Shelter.query.filter_by(id=shelter_id).one()
     if request.method == 'POST':
-        db_session.delete(shelter)
-        db_session.commit()
+        db.session.delete(shelter)
+        db.session.commit()
         print("Puppy {} deleted!".format(shelter_id))
         flash("Puppy {} deleted!".format(shelter_id))
         return redirect(url_for('shelters'))
@@ -123,13 +120,11 @@ def delete_shelter(shelter_id):
 @app.route('/puppies/', defaults={'page': 1})
 @app.route('/puppies/page/<int:page>')
 def puppies(page):
-    count = count_all_puppies()
-    puppies = get_puppies_for_page(page, PER_PAGE, count)
+    puppies = Puppy.query.paginate(page, app.config['POSTS_PER_PAGE'], False)
     if not puppies and page != 1:
         abort(404)
-    pagination = Pagination(page, PER_PAGE, count)
-    return render_template('puppies.html', pagination=pagination,
-                           puppies=puppies)
+    return render_template('puppies.html', pagination=puppies,
+                           puppies=puppies.items)
 
 
 @app.route('/puppies/<int:puppy_id>/profile')
@@ -140,55 +135,77 @@ def puppy_profile(puppy_id):
 
 @app.route('/puppies/new', methods=['GET', 'POST'])
 def new_puppy():
-    if request.method == 'POST':
-        if request.form['name']:
-            name = request.form['name']
-        else:
-            raise AttributeError("name must not be null!")
-        if request.form['weight']:
-            weight = request.form['weight']
-        else:
-            weight = None
-        if request.form['dateOfBirth']:
-            dateOfBirth = request.form['dateOfBirth']
-            dtm = datetime.strptime(dateOfBirth, '%Y-%m-%d')
-            dateOfBirth = datetime.date(dtm)
-        else:
-            dateOfBirth = None
-        if request.form['gender']:
-            gender = request.form['gender']
-        else:
-            gender = None
-        # Profile info
-        if request.form['picture']:
-            picture = request.form['picture']
-        else:
-            picture = None
-        if request.form['description']:
-            description = request.form['description']
-        else:
-            description = None
-        if request.form['specialneeds']:
-            specialNeeds = request.form['specialneeds']
-        else:
-            specialNeeds = None
-
-        new_profile = PuppyProfile(picture=picture, description=description,
-                                   specialNeeds=specialNeeds)
-        new_puppy = Puppy(name=name, weight=weight, dateOfBirth=dateOfBirth,
-                          gender=gender, profile=new_profile)
-        db_session.add(new_puppy)
-        db_session.commit()
+    shelters = Shelter.query.all()
+    form = NewPuppy(request.form)
+    form.shelter.choices = [(sh.id, sh.name) for sh in shelters
+                            if sh.maximum_capacity > sh.current_occupancy]
+    if request.method == 'POST' and form.validate():
+        # if request.form['name']:
+        #     name = request.form['name']
+        # else:
+        #     raise AttributeError("name must not be null!")
+        # if request.form['weight']:
+        #     weight = request.form['weight']
+        # else:
+        #     weight = None
+        # if request.form['dateOfBirth']:
+        #     dateOfBirth = request.form['dateOfBirth']
+        #     dtm = datetime.strptime(dateOfBirth, '%Y-%m-%d')
+        #     dateOfBirth = datetime.date(dtm)
+        # else:
+        #     dateOfBirth = None
+        # if request.form['gender']:
+        #     gender = request.form['gender']
+        # else:
+        #     gender = None
+        # # Profile info
+        # if request.form['picture']:
+        #     picture = request.form['picture']
+        # else:
+        #     picture = None
+        # if request.form['description']:
+        #     description = request.form['description']
+        # else:
+        #     description = None
+        # if request.form['specialneeds']:
+        #     specialNeeds = request.form['specialneeds']
+        # else:
+        #     specialNeeds = None
+        # if request.form['shelter']:
+        #     shelter = Shelter.query.filter_by(id=request.form['shelter']).one()
+        #     shelter.current_occupancy += 1
+        #     db.session.add(shelter)
+        # else:
+        #     shelter = None
+        #
+        # new_profile = PuppyProfile(picture=picture, description=description,
+        #                            specialNeeds=specialNeeds)
+        # new_puppy = Puppy(name=name, weight=weight, dateOfBirth=dateOfBirth,
+        #                   gender=gender, profile=new_profile, shelter=shelter)
+        new_profile = PuppyProfile(picture=form.picture.data,
+                                   description=form.description.data,
+                                   specialNeeds=form.special_needs.data)
+        new_puppy = Puppy(name=form.name.data, weight=form.weight.data,
+                          dateOfBirth=form.date_of_birth.data,
+                          gender=form.gender.data, profile=new_profile,
+                          shelter=form.shelter.data)
+        if form.shelter.data:
+            shelter = Shelter.query.filter_by(id=form.shelter.data).one()
+            shelter.current_occupancy += 1
+            db.session.add(shelter)
+        db.session.add(new_puppy)
+        db.session.commit()
         print("New puppy created!")
         flash("New puppy created!")
         return redirect(url_for('puppies'))
     else:
-        return render_template('newpuppy.html')
+        return render_template('newpuppy.html', form=form)
 
 
 @app.route('/puppies/<int:puppy_id>/edit', methods=['GET', 'POST'])
 def edit_puppy(puppy_id):
     puppy = Puppy.query.filter_by(id=puppy_id).one()
+    shelters = Shelter.query.all()
     if request.method == 'POST':
         if request.form['name']:
             puppy.name = request.form['name']
@@ -225,22 +242,54 @@ def edit_puppy(puppy_id):
                                        description=description,
                                        specialNeeds=specialNeeds)
             puppy.profile = new_profile
-
-        db_session.add(puppy)
-        db_session.commit()
+        if 'shelter' in request.form.keys():
+            if request.form['shelter']:
+                shelter = Shelter.query.filter_by(id=request.form['shelter']).one()
+                puppy.shelter = shelter
+                shelter.current_occupancy += 1
+                db.session.add(shelter)
+        db.session.add(puppy)
+        db.session.commit()
         print("Puppy {} edited!".format(puppy_id))
         flash("Puppy {} edited!".format(puppy_id))
         return redirect(url_for('puppies'))
     else:
-        return render_template('editpuppy.html', puppy=puppy)
+        return render_template('editpuppy.html', puppy=puppy,
+                               shelters=shelters)
+
+
+@app.route('/puppies/<int:puppy_id>/adopt', methods=['GET', 'POST'])
+def adopt_puppy(puppy_id):
+    puppy = Puppy.query.filter_by(id=puppy_id).one()
+    users = Adopter.query.all()
+    if request.method == 'POST':
+        if request.form['sel-users']:
+            for adopter_id in request.form.getlist('sel-users'):
+                adopter = Adopter.query.filter_by(id=adopter_id).one()
+                puppy.adopters.append(adopter)
+            puppy_shelter = puppy.shelter
+            puppy_shelter.puppies.remove(puppy)  # remove puppy from shelter
+            puppy_shelter.current_occupancy -= 1  # update current occupancy
+            db.session.add(puppy)  # update puppy
+            db.session.add(puppy_shelter)  # update shelter
+            db.session.commit()
+            print("Puppy {} adopted!".format(puppy_id))
+            flash("Puppy {} adopted!".format(puppy_id))
+            return redirect(url_for('puppies'))
+    else:
+        return render_template('adoptpuppy.html', puppy=puppy, users=users)
 
 
 @app.route('/puppies/<int:puppy_id>/delete', methods=['GET', 'POST'])
 def delete_puppy(puppy_id):
     puppy = Puppy.query.filter_by(id=puppy_id).one()
     if request.method == 'POST':
-        db_session.delete(puppy)
-        db_session.commit()
+        if puppy.shelter:
+            shelter = puppy.shelter
+            shelter.current_occupancy -= 1
+            db.session.add(shelter)
+        db.session.delete(puppy)
+        db.session.commit()
         print("Puppy {} deleted!".format(puppy_id))
         flash("Puppy {} deleted!".format(puppy_id))
         return redirect(url_for('puppies'))
@@ -254,9 +303,3 @@ def new_user():
         pass
     else:
         return render_template('newuser.html')
-
-
-if __name__ == '__main__':
-    app.secret_key = 'super_secret_key'
-    app.debug = True
-    app.run(host='0.0.0.0', port=5000)

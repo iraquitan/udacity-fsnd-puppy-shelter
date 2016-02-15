@@ -4,36 +4,33 @@
  * Author name: Iraquitan Cordeiro Filho
  * Author login: iraquitan
  * File: models
- * Date: 2/8/16
+ * db.Date: 2/8/16
  * Time: 3:05 PM
 """
-from sqlalchemy import Column, ForeignKey, Integer, String, Date, Numeric, \
-    Table
-from sqlalchemy.orm import relationship
-from puppyshelter.database import Base
+from . import db
 
 
 # Adoption table
-adoption_table = Table(
-    'adoption', Base.metadata,
-    Column('adopter_id', Integer, ForeignKey('adopter.id')),
-    Column('puppy_id', Integer, ForeignKey('puppy.id'))
+adoption_table = db.Table(
+    'adoption',
+    db.Column('adopter_id', db.Integer, db.ForeignKey('adopter.id')),
+    db.Column('puppy_id', db.Integer, db.ForeignKey('puppy.id'))
 )
 
 
 # Shelter model
-class Shelter(Base):
+class Shelter(db.Model):
     __tablename__ = 'shelter'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(80), nullable=False)
-    address = Column(String(250))
-    city = Column(String(80))
-    state = Column(String(20))
-    zipCode = Column(String(10))
-    website = Column(String)
-    maximum_capacity = Column(Integer, default=25)
-    current_occupancy = Column(Integer, default=0)
-    puppies = relationship("Puppy", back_populates='shelter')
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(80), nullable=False)
+    address = db.Column(db.String(250))
+    city = db.Column(db.String(80))
+    state = db.Column(db.String(20))
+    zipCode = db.Column(db.String(10))
+    website = db.Column(db.String)
+    maximum_capacity = db.Column(db.Integer, default=25)
+    current_occupancy = db.Column(db.Integer, default=0)
+    puppies = db.relationship("Puppy", back_populates='shelter')
 
     @property
     def serialize(self):
@@ -55,20 +52,20 @@ class Shelter(Base):
 
 
 # Puppy model
-class Puppy(Base):
+class Puppy(db.Model):
     __tablename__ = 'puppy'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
-    gender = Column(String(6), nullable=False)
-    dateOfBirth = Column(Date)
-    shelter_id = Column(Integer, ForeignKey('shelter.id'))
-    shelter = relationship("Shelter", back_populates='puppies')
-    weight = Column(Numeric(10))
-    # profile_id = Column(Integer, ForeignKey('puppy_profile.id'))
-    profile = relationship("PuppyProfile", uselist=False,
-                           back_populates="puppy")
-    adopters = relationship("Adopter", secondary=adoption_table,
-                            back_populates="puppies")
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(250), nullable=False)
+    gender = db.Column(db.String(6), nullable=False)
+    dateOfBirth = db.Column(db.Date)
+    shelter_id = db.Column(db.Integer, db.ForeignKey('shelter.id'))
+    shelter = db.relationship("Shelter", back_populates='puppies')
+    weight = db.Column(db.Numeric(10))
+    # profile_id = db.Column(db.Integer, ForeignKey('puppy_profile.id'))
+    profile = db.relationship("PuppyProfile", uselist=False,
+                              back_populates="puppy")
+    adopters = db.relationship("Adopter", secondary=adoption_table,
+                               back_populates="puppies")
 
     @property
     def serialize(self):
@@ -89,14 +86,14 @@ class Puppy(Base):
 
 
 # Puppy profile model
-class PuppyProfile(Base):
+class PuppyProfile(db.Model):
     __tablename__ = 'puppy_profile'
-    id = Column(Integer, primary_key=True)
-    picture = Column(String)
-    description = Column(String)
-    specialNeeds = Column(String)
-    puppy_id = Column(Integer, ForeignKey('puppy.id'))
-    puppy = relationship("Puppy", uselist=False, back_populates="profile")
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    picture = db.Column(db.String)
+    description = db.Column(db.String)
+    specialNeeds = db.Column(db.String)
+    puppy_id = db.Column(db.Integer, db.ForeignKey('puppy.id'))
+    puppy = db.relationship("Puppy", uselist=False, back_populates="profile")
 
     @property
     def serialize(self):
@@ -114,19 +111,19 @@ class PuppyProfile(Base):
 
 
 # Adopter model
-class Adopter(Base):
+class Adopter(db.Model):
     __tablename__ = 'adopter'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
-    gender = Column(String(6), nullable=False)
-    address = Column(String(250))
-    city = Column(String(80))
-    state = Column(String(20))
-    zipCode = Column(String(10))
-    dateOfBirth = Column(Date)
-    email = Column(String(80))
-    puppies = relationship("Puppy", secondary=adoption_table,
-                           back_populates="adopters")
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(250), nullable=False)
+    gender = db.Column(db.String(6), nullable=False)
+    address = db.Column(db.String(250))
+    city = db.Column(db.String(80))
+    state = db.Column(db.String(20))
+    zipCode = db.Column(db.String(10))
+    dateOfBirth = db.Column(db.Date)
+    email = db.Column(db.String(80))
+    puppies = db.relationship("Puppy", secondary=adoption_table,
+                              back_populates="adopters")
 
     @property
     def serialize(self):
@@ -141,7 +138,7 @@ class Adopter(Base):
             'city': self.city,
             'state': self.state,
             'zipCode': self.zipCode,
-            'dateOfBirth': self.dateOfBirth,
+            'dateOfBirth': self.db.DateOfBirth,
             'email': self.email,
             'puppies': [p.serialize for p in self.puppies]
         }

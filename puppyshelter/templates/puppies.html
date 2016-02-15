@@ -34,8 +34,7 @@
                     <p>Date of birth: {{ p.dateOfBirth }}</p>
                     <p>Weight: {{ p.weight }}</p>
                     <p class="text-right">
-                        <a href="{{ url_for('delete_puppy', puppy_id=p.id) }}" class="btn btn-danger" role="button">Delete</a>
-                        <a href="{{ url_for('edit_puppy', puppy_id=p.id) }}" class="btn btn-default" role="button">Edit</a>
+                        <a href="{{ url_for('puppy_profile', puppy_id=p.id) }}" class="btn btn-primary" role="button">View profile</a>
                     </p>
                   </div>
                 </div>
@@ -46,7 +45,7 @@
       <ul class="pagination">
           {% if pagination.has_prev %}
               <li>
-                  <a href="{{ url_for('puppies', page=(pagination.page - 1)) }}" aria-label="Previous">
+                  <a href="{{ url_for('puppies', page=(pagination.prev_num)) }}" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                   </a>
               </li>
@@ -68,7 +67,7 @@
           {% endfor %}
           {% if pagination.has_next %}
               <li>
-                  <a href="{{ url_for('puppies', page=(pagination.page + 1)) }}" aria-label="Next">
+                  <a href="{{ url_for('puppies', page=(pagination.next_num)) }}" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                   </a>
               </li>
