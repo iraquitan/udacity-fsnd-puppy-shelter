@@ -9,16 +9,24 @@
 """
 from flask_wtf import Form
 from wtforms import StringField, FloatField, DateField, SelectField, \
-    TextAreaField, FormField
+    TextAreaField, FormField, IntegerField, DecimalField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import url, InputRequired, Regexp, NumberRange, \
     Optional
 
 
+class AddressForm(Form):
+    address = StringField('Address')
+    city = StringField('City')
+    state = StringField('State')
+    zip_code = StringField('Zip Code')
+
+
 class PuppyProfileForm(Form):
     picture = URLField('Picture URL', validators=[url(), Optional()])
-    description = TextAreaField('Puppy description')
-    special_needs = TextAreaField('Puppy special needs')
+    description = TextAreaField('Puppy description', validators=[Optional()])
+    special_needs = TextAreaField('Puppy special needs',
+                                  validators=[Optional()])
 
 
 class PuppyForm(Form):
@@ -27,7 +35,7 @@ class PuppyForm(Form):
                                       Regexp('[A-Z]{1}[a-z]*',
                                              message='Should start with '
                                                      'uppercase letter')])
-    weight = FloatField('Puppy weight', [NumberRange(
+    weight = DecimalField('Puppy weight', [NumberRange(
         min=0, message='Weight must be positive'), Optional()])
     date_of_birth = DateField('Date of birth', [Optional()])
     gender = SelectField('Gender', choices=[('female', 'Female'),
@@ -35,3 +43,13 @@ class PuppyForm(Form):
     profile = FormField(PuppyProfileForm)
     shelter = SelectField('Shelter', choices=[(0, 'None')], coerce=int,
                           default=0)
+
+
+class ShelterForm(Form):
+    name = StringField('Name', [
+        InputRequired(message='Shelter name is required')])
+    address = FormField(AddressForm)
+    website = URLField('Website URL', validators=[url(), Optional()])
+    maximum_capacity = IntegerField('Maximum capacity', [NumberRange(
+        min=1, message='Capacity must be positive')],
+                                    default=25)
