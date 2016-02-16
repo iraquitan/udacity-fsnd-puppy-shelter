@@ -18,14 +18,21 @@
                 </fieldset>
                 <fieldset>
                     <h2>Profile (Optional)</h2>
-                    {{ render_fieldBS(form.profile['picture'], placeholder=form.profile['picture'].data) }}
-                    {{ render_fieldBS(form.profile['description'], placeholder=form.profile['description'].data) }}
-                    {{ render_fieldBS(form.profile['special_needs'], placeholder=form.profile['special_needs'].data) }}
+                    {% for value in form.profile %}
+                        {{ render_fieldBS(value, placeholder=value.data) }}
+                    {% endfor %}
                 </fieldset>
-                <fieldset>
-                    <h2>Shelter</h2>
-                    {{ render_fieldBS(form.shelter) }}
-                </fieldset>
+                {% if 'shelter' in form %}
+                    <fieldset>
+                        <h2>Shelter</h2>
+                        {{ render_fieldBS(form.shelter) }}
+                    </fieldset>
+                {% else %}
+                    <fieldset>
+                        <h2>Shelter</h2>
+                        Puppy adopted
+                    </fieldset>
+                {% endif %}
                 <br>
                 <fieldset>
                     <button type="submit" class="btn btn-primary">Edit</button>
