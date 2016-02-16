@@ -13,24 +13,30 @@
                 <div class="well well-sm">{{ puppy.weight }}</div>
                 Date of birth:
                 <div class="well well-sm">{{ puppy.dateOfBirth }}</div>
+                {% if puppy.shelter %}
+                    Shelter:
+                    <div class="well well-sm">{{ puppy.shelter.name }}</div>
+                {% endif %}
                 <div class="text-right">
-                    {% if puppy.shelter %}
-                        <a href="{{ url_for('adopt_puppy', puppy_id=puppy.id) }}" class="btn btn-success" role="button">Adopt</a>
-                    {% else %}
+                    {% if puppy.adopters|length > 0 %}
                         <a href="{{ url_for('adopt_puppy', puppy_id=puppy.id) }}" class="btn btn-success disabled" role="button">Adopt</a>
+                    {% else %}
+                        <a href="{{ url_for('adopt_puppy', puppy_id=puppy.id) }}" class="btn btn-success" role="button">Adopt</a>
                     {% endif %}
                     <a href="{{ url_for('delete_puppy', puppy_id=puppy.id) }}" class="btn btn-danger" role="button">Delete</a>
                     <a href="{{ url_for('edit_puppy', puppy_id=puppy.id) }}" class="btn btn-default" role="button">Edit</a>
                 </div>
+                {% if puppy.adopters|length > 0 %}
                     <ul class="list-group">
-                    Adopters:
-                    {% for adopter in puppy.adopters %}
-                        <li class="list-group-item pre-scrollable">
-                            <span class="badge">{{ adopter.puppies|length }}</span>
-                            {{ adopter.name }}
-                        </li>
-                    {% endfor %}
-                </ul>
+                        Adopters:
+                        {% for adopter in puppy.adopters %}
+                            <li class="list-group-item pre-scrollable">
+                                <span class="badge">{{ adopter.puppies|length }}</span>
+                                {{ adopter.name }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
             </div>
         </div>
         <div class="row">
