@@ -15,4 +15,6 @@ app.config.from_object('config')
 app.config.from_pyfile('config.py')
 
 db = SQLAlchemy(app)
-import puppyshelter.views
+import puppyshelter.views.main
+import puppyshelter.views.puppy
+import puppyshelter.views.shelter
