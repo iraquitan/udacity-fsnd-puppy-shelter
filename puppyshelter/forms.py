@@ -9,10 +9,10 @@
 """
 from flask_wtf import Form
 from wtforms import StringField, FloatField, DateField, SelectField, \
-    TextAreaField, FormField, IntegerField, DecimalField
+    TextAreaField, FormField, IntegerField, DecimalField, SelectMultipleField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import url, InputRequired, Regexp, NumberRange, \
-    Optional
+    Optional, Email
 
 
 class AddressForm(Form):
@@ -41,8 +41,8 @@ class PuppyForm(Form):
     gender = SelectField('Gender', choices=[('female', 'Female'),
                                             ('male', 'Male')])
     profile = FormField(PuppyProfileForm)
-    shelter = SelectField('Shelter', choices=[(0, 'None')], coerce=int,
-                          default=0)
+    shelter = SelectField('Shelter to check', choices=[(0, 'None')],
+                          coerce=int, default=0)
 
 
 class ShelterForm(Form):
@@ -53,3 +53,22 @@ class ShelterForm(Form):
     maximum_capacity = IntegerField('Maximum capacity', [NumberRange(
         min=1, message='Capacity must be positive')],
                                     default=25)
+
+
+class AdoptPuppyForm(Form):
+    adopters = SelectMultipleField('Adopter(s)', coerce=int,
+                                   validators=[InputRequired()])
+
+
+class UserForm(Form):
+    name = StringField('User name', [InputRequired(
+                                          message='User name is required'),
+                                      Regexp('[A-Z]{1}[a-z]*',
+                                             message='Should start with '
+                                                     'uppercase letter')])
+    gender = SelectField('Gender', choices=[('female', 'Female'),
+                                            ('male', 'Male'),
+                                            ('other', 'Other')])
+    address = FormField(AddressForm)
+    date_of_birth = DateField('Date of birth', [Optional()])
+    email = StringField('User email', [Email()])
