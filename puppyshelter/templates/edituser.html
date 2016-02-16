@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import render_fieldBS %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-3 col-md-3 col-sm-3"></div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+            <h1>Edit user form</h1>
+            <form action="{{ url_for('edit_user', user_id=user.id) }}" method="POST">
+                {{ form.hidden_tag() }}
+                {{ form.address.hidden_tag() }}
+                <fieldset>
+                    {{ render_fieldBS(form.name, placeholder=form.name.label.text) }}
+                    {{ render_fieldBS(form.gender, placeholder=form.gender.label.text) }}
+                    {{ render_fieldBS(form.date_of_birth, placeholder=form.date_of_birth.label.text) }}
+                    {{ render_fieldBS(form.email, placeholder=form.email.label.text) }}
+                    {% for value in form.address %}
+                        {{ render_fieldBS(value, placeholder=value.label.text) }}
+                    {% endfor %}
+                </fieldset>
+                <br>
+                <fieldset class="text-right">
+                    <button type="submit" class="btn btn-primary">Edit</button>
+                    <a href="{{url_for('index')}}" class="btn btn-default" role="button">Cancel</a>
+                </fieldset>
+                <br><br>
+                </form>
+{#                    <section>#}
+{#                        Name:#}
+{#                        <div class="input-group">#}
+{#                          <span class="input-group-addon" id="name">#}
+{#                              <span class="glyphicon glyphicon-user" aria-hidden="true"></span>#}
+{#                          </span>#}
+{#                          <input type="text" class="form-control" name="name"#}
+{#                                 placeholder="User name"#}
+{#                                 aria-describedby="name"#}
+{#                                 data-toggle="tooltip" title="Needed to create new user" data-placement="right">#}
+{#                        </div>#}
+{#                    </section>#}
+    {#                    <br>#}
+{#                    <section>#}
+{#                        Gender:#}
+{#                        <div class="form-group">#}
+{#                          <label for="sel1">#}
+{#                              <select class="form-control" id="sel1" name="gender" data-toggle="tooltip" title="Needed to create new user" data-placement="right">#}
+{#                                <option value="0" selected="" disabled="">Gender</option>#}
+{#                                <option value="male">Male</option>#}
+{#                                <option value="female">Female</option>#}
+{#                              </select>#}
+{#                          </label>#}
+{#                        </div>#}
+{#                    </section>#}
+    {#                    <br>#}
+{#                    <section>#}
+{#                        Date of birth:#}
+{#                        <div class="input-group">#}
+{#                          <span class="input-group-addon" id="birth">#}
+{#                              <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>#}
+{#                          </span>#}
+{#                          <input type="date" class="form-control" name="dateOfBirth" placeholder="Date of birth" aria-describedby="birth">#}
+{#                        </div>#}
+{#                    </section>#}
+    {#                    <br>#}
+{#                    <section>#}
+{#                        Email:#}
+{#                        <div class="input-group">#}
+{#                          <span class="input-group-addon" id="email">#}
+{#                              <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>#}
+{#                          </span>#}
+{#                          <input type="email" class="form-control" name="email" placeholder="User email" aria-describedby="email">#}
+{#                        </div>#}
+{#                    </section>#}
+    {#                    <br>#}
+{#                    <section>#}
+{#                        Address:#}
+{#                        <div class="input-group">#}
+{#                          <span class="input-group-addon" id="address">#}
+{#                              <span class="glyphicon glyphicon-home" aria-hidden="true"></span>#}
+{#                          </span>#}
+{#                          <input type="text" class="form-control" name="address" placeholder="User address" aria-describedby="address">#}
+{#                        </div>#}
+{#                    </section>#}
+    {#                    <br>#}
+{#                    <section>#}
+{#                        City:#}
+{#                        <div class="input-group">#}
+{#                          <span class="input-group-addon" id="city">#}
+{#                              <span class="glyphicon glyphicon-globe" aria-hidden="true"></span>#}
+{#                          </span>#}
+{#                          <input type="text" class="form-control" name="city" placeholder="User city" aria-describedby="city">#}
+{#                        </div>#}
+{#                    </section>#}
+    {#                    <br>#}
+{#                    <section>#}
+{#                        State:#}
+{#                        <div class="input-group">#}
+{#                          <span class="input-group-addon" id="state">#}
+{#                              <span class="glyphicon glyphicon-globe" aria-hidden="true"></span>#}
+{#                          </span>#}
+{#                          <input type="text" class="form-control" name="state" placeholder="User state" aria-describedby="state">#}
+{#                        </div>#}
+{#                    </section>#}
+    {#                    <br>#}
+{#                    <section>#}
+{#                        Zip code:#}
+{#                        <div class="input-group">#}
+{#                          <span class="input-group-addon" id="zipcode">#}
+{#                              <span class="glyphicon glyphicon-home" aria-hidden="true"></span>#}
+{#                          </span>#}
+{#                          <input type="text" class="form-control" name="zipcode" placeholder="User zip code" aria-describedby="zipcode">#}
+{#                        </div>#}
+{#                    </section>#}
+{#                </fieldset>#}
+{#                <br>#}
+{#                <fieldset class="text-right">#}
+{#                    <button type="submit" class="btn btn-primary">Create</button>#}
+{#                    <a href="{{url_for('index')}}" class="btn btn-default" role="button">Cancel</a>#}
+{#                </fieldset>#}
+{#                <br><br>#}
+{#            </form>#}
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3"></div>
+    </div>
+</div>
+{% endblock %}
