@@ -12,12 +12,11 @@
                 <fieldset>
                     <h2>Shelter info</h2>
                     {{ render_fieldBS(form.name, placeholder=form.name.label.text) }}
-                    {{ render_fieldBS(form.address['address'], placeholder=form.address['address'].label.text) }}
-                    {{ render_fieldBS(form.address['city'], placeholder=form.address['city'].label.text) }}
-                    {{ render_fieldBS(form.address['state'], placeholder=form.address['state'].label.text) }}
-                    {{ render_fieldBS(form.address['zip_code'], placeholder=form.address['zip_code'].label.text) }}
                     {{ render_fieldBS(form.website, placeholder=form.website.label.text) }}
                     {{ render_fieldBS(form.maximum_capacity, placeholder=form.maximum_capacity.label.text) }}
+                    {% for value in form.address %}
+                        {{ render_fieldBS(value, placeholder=value.label.text) }}
+                    {% endfor %}
                 </fieldset>
                 <br>
                 <fieldset>
