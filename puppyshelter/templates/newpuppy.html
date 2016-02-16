@@ -19,9 +19,9 @@
                 </fieldset>
                 <fieldset>
                     <h2>Profile (Optional)</h2>
-                    {{ render_fieldBS(form.profile['picture'], placeholder=form.profile['picture'].label.text) }}
-                    {{ render_fieldBS(form.profile['description'], placeholder=form.profile['description'].label.text) }}
-                    {{ render_fieldBS(form.profile['special_needs'], placeholder=form.profile['special_needs'].label.text) }}
+                    {% for value in form.profile %}
+                        {{ render_fieldBS(value, placeholder=value.label.text) }}
+                    {% endfor %}
                 </fieldset>
                 <fieldset>
                     <h2>Shelter</h2>
